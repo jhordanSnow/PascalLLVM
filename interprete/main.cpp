@@ -10,12 +10,15 @@ int main(int argc, char** argv) {
    }
 
    ifstream codefile (argv[1]);
-   string line;
+   string code;
    if (codefile.is_open()) {
-      while (getline(codefile, line)) {
-         cout << line << endl;
-      }
-      codefile.close();
+      codefile.seekg(0, ios::end);   
+      code.reserve(codefile.tellg());
+      codefile.seekg(0, ios::beg);
+
+      code.assign((istreambuf_iterator<char>(codefile)),
+            istreambuf_iterator<char>());
+      cout << code << endl;
    } else {
       cout << "No se abrio ningun archivo";
    }
