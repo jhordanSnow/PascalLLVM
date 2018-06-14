@@ -3,5 +3,8 @@ CFLAGS=-Wall -I.
 LIBS=
 SRC=$(wildcard *.cpp)
 
-test: $(SRC)
+program: $(SRC)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+clear:
+	rm program
