@@ -1,6 +1,7 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include<list>
 
 using namespace std;
 int main(int argc, char** argv) {
@@ -10,19 +11,18 @@ int main(int argc, char** argv) {
    }
 
    ifstream codefile (argv[1]);
-   string code;
+   string line;
+   list<string>* code = new list<string>();
    if (codefile.is_open()) {
-      codefile.seekg(0, ios::end);   
-      code.reserve(codefile.tellg());
-      codefile.seekg(0, ios::beg);
-
-      code.assign((istreambuf_iterator<char>(codefile)),
-            istreambuf_iterator<char>());
-      cout << code << endl;
+      while (getline(codefile, line)) {
+         code->push_front(line);
+      }
+      codefile.close();
    } else {
       cout << "No se abrio ningun archivo";
    }
 
+   cout << code->size() << endl;
 
    return 0;
 }
