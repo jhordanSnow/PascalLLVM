@@ -3,7 +3,10 @@
 #include<string>
 #include<list>
 
+#include "headders/lexer.h"
+
 using namespace std;
+using namespace MiniPascal;
 
 void reportError(string error){
   std::cout << error << '\n';
@@ -16,7 +19,7 @@ list<string>* getInputStream(string fileName){
 
   if (codefile.is_open()) {
      while (getline(codefile, line)) {
-        code->push_front(line);
+        code->push_back(line);
      }
      codefile.close();
   } else {
@@ -33,9 +36,17 @@ int main(int argc, char** argv) {
       return -1;
    }
 
-   list<string>* code = getInputStream(argv[1]);
+   Lexer* lexer = new Lexer();
 
-   std::cout << "caca - " << code->size() << '\n';
+   list<string>* code = getInputStream(argv[1]);
+   list<Token*>* tokens = lexer->tokenize(code);
+
+   for (list<Token*>::iterator it = tokens->begin(); it != tokens->end(); ++it){
+     Token* t = (*it);
+     std::cout << t->getTokenLocation() << ": " << t->getTokenName() << "\n";
+   }
+
+   std::cout << "Tokens - " << tokens->size() << '\n';
 
    return 0;
 }

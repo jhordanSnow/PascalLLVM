@@ -1,7 +1,7 @@
 #include "../headders/token.h"
 
 namespace MiniPascal{
-  Token::Token(TokenType _type, TokenValue _value, int _row, string name){
+  Token::Token(TokenType _type, TokenValue _value, int _row, string _name){
     this->_type = _type;
     this->_value = _value;
     this->_row = _row;
