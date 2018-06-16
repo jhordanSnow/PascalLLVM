@@ -42,8 +42,8 @@ int main(int argc, char** argv) {
    list<Token*>* tokens = lexer->tokenize(code);
 
    for (list<Token*>::iterator it = tokens->begin(); it != tokens->end(); ++it){
-     Token* t = (*it);
-     std::cout << t->getTokenLocation() << ": " << t->getTokenName() << "\n";
+     //Token* t = (*it);
+     //std::cout << t->getTokenLocation() << ": " << t->getTokenName() << "\n";
    }
 
    std::cout << "Tokens - " << tokens->size() << '\n';

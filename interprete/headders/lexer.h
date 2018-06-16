@@ -9,7 +9,8 @@ namespace MiniPascal{
       void getTokensInLine(string line);
       void makeToken();
       void newState(char character);
-      void makeTokenDelimiter(char character);
+      void checkKeyword();
+      void makeTokenSymbol(char character);
       virtual ~Lexer();
     private:
       string buffer;
