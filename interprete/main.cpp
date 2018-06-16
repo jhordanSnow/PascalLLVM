@@ -3,7 +3,6 @@
 #include<string>
 #include<list>
 
-#include "headders/ast.h"
 #include "headders/lexer.h"
 
 using namespace std;
@@ -30,6 +29,7 @@ list<string>* getInputStream(string fileName){
   return code;
 }
 
+
 int main(int argc, char** argv) {
    if (argc != 2) {
       reportError("uso " + string(argv[0]) + " <NombreArchivo>");
@@ -42,8 +42,8 @@ int main(int argc, char** argv) {
    list<Token*>* tokens = lexer->tokenize(code);
 
    for (list<Token*>::iterator it = tokens->begin(); it != tokens->end(); ++it){
-     //Token* t = (*it);
-     //std::cout << t->getTokenLocation() << ": " << t->getTokenName() << "\n";
+     Token* t = (*it);
+     std::cout << t->getTokenLocation() << ": " << t->getTokenName() << "\n";
    }
 
    std::cout << "Tokens - " << tokens->size() << '\n';
