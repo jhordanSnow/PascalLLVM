@@ -3,6 +3,7 @@
 #include<string>
 #include<list>
 
+#include "headders/ast.h"
 #include "headders/lexer.h"
 
 using namespace std;
@@ -28,7 +29,6 @@ list<string>* getInputStream(string fileName){
 
   return code;
 }
-
 
 int main(int argc, char** argv) {
    if (argc != 2) {
