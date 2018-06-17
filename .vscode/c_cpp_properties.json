@@ -10,7 +10,8 @@
             },
             "includePath": [
                 "${workspaceFolder}",
-                "${workspaceFolder}/interprete"
+                "${workspaceFolder}/interprete", 
+                "${workspaceFolder}/interprete/headders"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

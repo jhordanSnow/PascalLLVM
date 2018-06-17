@@ -40,7 +40,7 @@ Block* AnalizadorSintactico::block(list<Token*>* tokenList) {
    if (tokenHead->getTokenName() == "var") {
       tokenList->pop_front();
    } else {
-      
+
    }
 
    tokenHead = tokenList->front();
@@ -52,8 +52,34 @@ Block* AnalizadorSintactico::block(list<Token*>* tokenList) {
       new CompoundStatement({})
       )
       );
-
 }
+
+StatementPart* AnalizadorSintactico::statementPart(list<Token*>* tokenList) {
+   Token* tokenHead = tokenList->front();
+   if (tokenHead->getTokenName() == "var") {
+      tokenList->pop_front();
+   }
+	return new StatementPart({});
+}
+
+CompoundStatement* AnalizadorSintactico::compoundStatement(list<Token*>* tokenList) {
+   Token* tokenHead = tokenList->front();
+   if (tokenHead->getTokenName() == "begin") {
+      tokenList->pop_front();
+   }
+   list<Statement*>* statements = AnalizadorSintactico::statements(tokenList);
+   tokenHead = tokenList->front();
+   if (tokenHead->getTokenName() == "end") {
+      tokenList->pop_front();
+   }
+	return new CompoundStatement(statements);
+}
+
+list<Statement*>* AnalizadorSintactico::statements(list<Token*>* tokenList){
+   list<Statement*>* statements = new list<Statement*>();
+   return statements;
+}
+
 
 VariableDeclarationPart* AnalizadorSintactico::variableDeclarationPart(list<Token*>* tokenList) {
    Token* tokenHead = tokenList->front();
@@ -68,9 +94,41 @@ VariableDeclarationPart* AnalizadorSintactico::variableDeclarationPart(list<Toke
 }
 
 list<VariableDeclaration*>* AnalizadorSintactico::variableDeclarations(list<Token*>* tokenList) {
-   //Variosxd   
+   //Variosxd
    list<VariableDeclaration*>* variableDeclarations = new list<VariableDeclaration*>();
    return variableDeclarations;
+}
+
+// Variable* AnalizadorSintactico::variable(list<Token*>* tokenList){
+//    return new Variable();
+// }
+
+EntireVariable* AnalizadorSintactico::entireVariable(list<Token*>* tokenList){
+   return new EntireVariable(variableIdentifier(tokenList));
+}
+VariableIdentifier* AnalizadorSintactico::variableIdentifier(list<Token*>* tokenList){
+   return new VariableIdentifier(identifier(tokenList));
+}
+
+Expression* AnalizadorSintactico::expression(list<Token*>* tokenList){
+   return new Expression(new SimpleExpression(Sign::POSITIVE,{},{}));
+}
+SimpleExpression* AnalizadorSintactico::simpleExpression(list<Token*>* tokenList){
+   Token* tokenHead = tokenList->front();
+   if (tokenHead->getTokenName() == "+") {
+      tokenList->pop_front();
+   }else if (tokenHead->getTokenName() == "-") {
+      tokenList->pop_front();
+   }
+   return new SimpleExpression(Sign::POSITIVE,{},{});
+}
+
+Term* AnalizadorSintactico::term(list<Token*>* tokenList){
+  return new Term({},{});
+}
+
+Factor* AnalizadorSintactico::factor(list<Token*>* tokenList){
+  return new Factor(new Constant(0));
 }
 
 
