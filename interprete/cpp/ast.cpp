@@ -29,16 +29,16 @@ IndexRange::IndexRange(int begining, int end) : Node() {
    this->end = end;
 }
 
-ArrayType::ArrayType(SimpleType* simpleType) : Node() {
+ArrayType::ArrayType(SimpleType simpleType) : Node() {
    this->simpleType = simpleType;
 }
 
-ArrayType::ArrayType(IndexRange* indexRange, SimpleType* simpleType) : Node() {
+ArrayType::ArrayType(IndexRange* indexRange, SimpleType simpleType) : Node() {
    this->indexRange = indexRange;
    this->simpleType = simpleType;
 }
 
-DataType::DataType(SimpleType* simpleType) : Node() {
+DataType::DataType(SimpleType simpleType) : Node() {
    this->simpleType = simpleType;
 }
 
@@ -63,11 +63,11 @@ IndexedVariable::IndexedVariable(ArrayVariable* arrayVariable, std::list<Express
    this->expressionList = expressionList;
 }
 
-Variable::Variable(EntireVariable* entireVariable) : Node() {
+VariableNT::VariableNT(EntireVariable* entireVariable) : Node() {
    this->entireVariable = entireVariable;
 }
 
-Variable::Variable(IndexedVariable* indexedVariable) : Node() {
+VariableNT::VariableNT(IndexedVariable* indexedVariable) : Node() {
    this->indexedVariable = indexedVariable;
 }
 
@@ -75,7 +75,7 @@ NotFactor::NotFactor(AbstractFactor* factor) : AbstractFactor() {
    this->factor = factor;
 }
 
-Factor::Factor(Variable* variable) : AbstractFactor() {
+Factor::Factor(VariableNT* variable) : AbstractFactor() {
    this->variable = variable;
 }
 
@@ -88,7 +88,7 @@ Term::Term(std::list<Factor>* factors, std::list<MultiplicationOperator>* operat
    this->operators = operators;
 }
 
-SimpleExpression::SimpleExpression(Sign* sign, std::list<Term>* terms, std::list<AdditionOperator>* additionOperators) : Node() {
+SimpleExpression::SimpleExpression(Sign sign, std::list<Term>* terms, std::list<AdditionOperator>* additionOperators) : Node() {
    this->sign = sign;
    this->terms = terms;
    this->additionOperators = additionOperators;
@@ -98,7 +98,7 @@ Expression::Expression(SimpleExpression* simpleExpression1) : Node() {
    this->simpleExpression1 = simpleExpression1;
 }
 
-Expression::Expression(SimpleExpression* simpleExpression1, RelationalOperator* relationalOperator, SimpleExpression* simpleExpression2) : Node() {
+Expression::Expression(SimpleExpression* simpleExpression1, RelationalOperator relationalOperator, SimpleExpression* simpleExpression2) : Node() {
    this->simpleExpression1 = simpleExpression1;
    this->relationalOperator = relationalOperator;
    this->simpleExpression2 = simpleExpression2;
@@ -121,15 +121,15 @@ StructuredStatement::StructuredStatement(WhileStatement* whileStatement) : Node(
    this->whileStatement = whileStatement;
 }
 
-WriteStatement::WriteStatement(std::list<Variable> variableList) : Node() {
+WriteStatement::WriteStatement(std::list<VariableNT> variableList) : Node() {
    this->variableList = variableList;
 }
 
-ReadStatement::ReadStatement(std::list<Variable> variableList) : Node() {
+ReadStatement::ReadStatement(std::list<VariableNT>* variableList) : Node() {
    this->variableList = variableList;
 }
 
-AssignmentStatement::AssignmentStatement(Variable* variable, Expression* expression) : Node() {
+AssignmentStatement::AssignmentStatement(VariableNT* variable, Expression* expression) : Node() {
    this->variable = variable;
    this->expression = expression;
 }

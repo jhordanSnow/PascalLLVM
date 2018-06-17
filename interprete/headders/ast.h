@@ -9,23 +9,26 @@ class CompoundStatement;
 class Node {
    public:
       Node();
+      execute();
 };
 
 class Expression;
 /* Lexical Grammar */
-class Identifier : protected Node {
+class Identifier : public Node {
    public:
       Identifier(std::string identifier);
       std::string identifier;
+      execute();
 };
 
-class ConstantIdentifier : protected Node { 
+class ConstantIdentifier : public Node { 
    public:
       ConstantIdentifier(Identifier* identifier);
       Identifier* identifier;
+      execute();
 };
 
-class Constant : protected Node {
+class Constant : public Node {
    public:
       Constant(int intConst);
       Constant(char charConst);
@@ -33,14 +36,16 @@ class Constant : protected Node {
       int intConst;
       char charConst;
       ConstantIdentifier* constIdentifier;
+      execute();
 };
 /* Lexical Grammar */
 
 /* Types */
-class TypeIdentifier : protected Node {
+class TypeIdentifier : public Node {
    public:
       TypeIdentifier(Identifier* identifier);
       Identifier* identifier;
+      execute();
 };
 
 enum class SimpleType{
@@ -49,63 +54,71 @@ enum class SimpleType{
    BOOLEAN
 };
 
-class IndexRange : protected Node {
+class IndexRange : public Node {
    public:
       IndexRange(int begining, int end);
       int begining;
       int end;
+      execute();
 };
 
-class ArrayType : protected Node {
+class ArrayType : public Node {
    public:
-      ArrayType(SimpleType* simpleType);
-      ArrayType(IndexRange* indexRange, SimpleType* simpleType);
+      ArrayType(SimpleType simpleType);
+      ArrayType(IndexRange* indexRange, SimpleType simpleType);
       IndexRange* indexRange;
-      SimpleType* simpleType;
+      SimpleType simpleType;
+      execute();
 };
 
-class DataType : protected Node {
+class DataType : public Node {
    public:
-      DataType(SimpleType* simpleType);
+      DataType(SimpleType simpleType);
       DataType(ArrayType* arrayType);
-      SimpleType* simpleType;
+      SimpleType simpleType;
       ArrayType* arrayType;
+      execute();
 };
 /* Types */
 
 /* Expressions */
 
-class VariableIdentifier : protected Node {
+class VariableIdentifier : public Node {
    public:
       VariableIdentifier(Identifier* variableIdentifier);
       Identifier* variableIdentifier;
+      execute();
 };
 
-class EntireVariable : protected Node {
+class EntireVariable : public Node {
    public:
       EntireVariable(VariableIdentifier* variableIdentifier);
       VariableIdentifier* variableIdentifier;
+      execute();
 };
 
-class ArrayVariable : protected Node {
+class ArrayVariable : public Node {
    public: 
       ArrayVariable(EntireVariable* entireVariable);
       EntireVariable* entireVariable;
+      execute();
 };
 
-class IndexedVariable : protected Node {
+class IndexedVariable : public Node {
    public:
       IndexedVariable(ArrayVariable* arrayVariable, std::list<Expression>* expressionList);
       ArrayVariable* arrayVariable;
       std::list<Expression>* expressionList;
+      execute();
 };
 
-class Variable : protected Node {
+class VariableNT : public Node {
    public:
-      Variable(EntireVariable* entireVariable);
-      Variable(IndexedVariable* indexedVariable);
+      VariableNT(EntireVariable* entireVariable);
+      VariableNT(IndexedVariable* indexedVariable);
       EntireVariable* entireVariable;
       IndexedVariable* indexedVariable;
+      execute();
 };
 
 enum class RelationalOperator{
@@ -134,65 +147,73 @@ enum class Sign {
    NEGATIVE
 };
 
-class AbstractFactor : protected Node {};
-class NotFactor : protected AbstractFactor {
+class AbstractFactor : public Node {execute();
+};
+class NotFactor : public AbstractFactor {
    public:
       NotFactor(AbstractFactor* factor);
       AbstractFactor* factor;
+      execute();
 };
 
-class Factor : protected AbstractFactor {
+class Factor : public AbstractFactor {
    public:
-      Factor(Variable* variable);
+      Factor(VariableNT* variable);
       Factor(Constant* constant);
-      Variable* variable;
+      VariableNT* variable;
       Constant* constant;
+      execute();
 };
 
-class Term : protected Node {
+class Term : public Node {
    public:
       Term(std::list<Factor>* factors, std::list<MultiplicationOperator>* operators);
       std::list<Factor>* factors;
       std::list<MultiplicationOperator>* operators;
+      execute();
 };
 
-class SimpleExpression : protected Node {
+class SimpleExpression : public Node {
    public:
-      SimpleExpression(Sign* sign, std::list<Term>* terms, std::list<AdditionOperator>* additionOperators);
-      Sign* sign;
+      SimpleExpression(Sign sign, std::list<Term>* terms, std::list<AdditionOperator>* additionOperators);
+      Sign sign;
       std::list<Term>* terms;
       std::list<AdditionOperator>* additionOperators;
+      execute();
 };
 
-class Expression : protected Node {
+class Expression : public Node {
    public:
       Expression(SimpleExpression* simpleExpression1);
-      Expression(SimpleExpression* simpleExpression1, RelationalOperator* relationalOperator, SimpleExpression* simpleExpression2);
+      Expression(SimpleExpression* simpleExpression1, RelationalOperator relationalOperator, SimpleExpression* simpleExpression2);
       SimpleExpression* simpleExpression1;
-      RelationalOperator* relationalOperator;
+      RelationalOperator relationalOperator;
       SimpleExpression* simpleExpression2;
+      execute();
 };
 /* Expressions */
 
 /* Statements */
 class Statement;
 
-class WhileStatement : protected Node {
+class WhileStatement : public Node {
    public:
       WhileStatement(Expression* expression, Statement* statement);
       Expression* expression;
       Statement* statement;
+      execute();
 };
 
-class IfStatement : protected Node {
+class IfStatement : public Node {
    public:
       IfStatement(Expression* expression, Statement* thenStatement, Statement* elseStatement);
       Expression* expression;
       Statement* statement;
       Statement* elseStatement;
+      execute();
 };
 
-class StructuredStatement : protected Node {
+class StructuredStatement : public Node {
    public:
       StructuredStatement(CompoundStatement* compoundStatement);
       StructuredStatement(IfStatement* ifStatement);
@@ -200,28 +221,32 @@ class StructuredStatement : protected Node {
       CompoundStatement* compoundStatement;
       IfStatement* ifStatement;
       WhileStatement* whileStatement;
+      execute();
 };
 
-class WriteStatement : protected Node {
+class WriteStatement : public Node {
    public:
-      WriteStatement(std::list<Variable> variableList);
-      std::list<Variable> variableList;
+      WriteStatement(std::list<VariableNT> variableList);
+      std::list<VariableNT> variableList;
+      execute();
 };
 
-class ReadStatement : protected Node {
+class ReadStatement : public Node {
    public:
-      ReadStatement(std::list<Variable> variableList);
-      std::list<Variable> variableList;
+      ReadStatement(std::list<VariableNT>* variableList);
+      std::list<VariableNT>* variableList;
+      execute();
 };
 
-class AssignmentStatement : protected Node {
+class AssignmentStatement : public Node {
    public:
-      AssignmentStatement(Variable* variable, Expression* expression);
-      Variable* variable;
+      AssignmentStatement(VariableNT* variable, Expression* expression);
+      VariableNT* variable;
       Expression* expression;
+      execute();
 };
 
-class SimpleStatement : protected Node {
+class SimpleStatement : public Node {
    public:
       SimpleStatement(AssignmentStatement* assignmentStatement);
       SimpleStatement(ReadStatement* readStatement);
@@ -229,53 +254,61 @@ class SimpleStatement : protected Node {
       AssignmentStatement* assignmentStatement;
       ReadStatement* readStatement;
       WriteStatement* writeStatement;
+      execute();
 };
 
-class Statement : protected Node {
+class Statement : public Node {
    public:
       Statement(SimpleStatement* simpleStatement);
       Statement(StructuredStatement* structuredStatement);
       SimpleStatement* simpleStatement;
       StructuredStatement* structuredStatement;
+      execute();
 };
 
-class CompoundStatement : protected Node {
+class CompoundStatement : public Node {
    public:
       CompoundStatement(std::list<Statement> statementList);
       std::list<Statement> statementList;
+      execute();
 };
 
-class StatementPart : protected Node {
+class StatementPart : public Node {
    public:
       StatementPart(CompoundStatement* compoundStatement);
       CompoundStatement* compoundStatement;
+      execute();
 };
 
 /* Statements */
 
-class VariableDeclaration : protected Node {
+class VariableDeclaration : public Node {
    public:
       VariableDeclaration(std::list<Identifier>* identifierList, DataType* dataType);
       std::list<Identifier>* identifierList;
       DataType* dataType;
+      execute();
 };
 
-class VariableDeclarationPart : protected Node {
+class VariableDeclarationPart : public Node {
    public:
       VariableDeclarationPart(std::list<VariableDeclaration>* variableDeclarations);
       std::list<VariableDeclaration>* variableDeclarations;
+      execute();
 };
 
-class Block : protected Node {
+class Block : public Node {
    public:
       Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* statementPart);
       VariableDeclarationPart* variableDeclarationPart;
       StatementPart* statementPart;
+      execute();
 };
 
-class Program : protected Node {
+class Program : public Node {
    public:
       Program(Identifier* identifier, Block* block);
       Identifier* identifier;
       Block* block;
+      execute();
 };
