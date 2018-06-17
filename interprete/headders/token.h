@@ -13,70 +13,23 @@ namespace MiniPascal{
     KEYWORDS,
     UNKNOWN
   };
-  enum class TokenValue{
-    PROGRAM,
-    BEGIN,
-    END,
-    OF,
-    DO,
-    IF,
-    THEN,
-    ELSE,
-    NOT,
-    WHILE,
-    PROCEDURE,
-    FUNCTION,
-
-    RECORD,
-    ARRAY,
-    TYPE,
-    VAR,
-
-    PAREN_LEFT,
-    PAREN_RIGHT,
-    SQUARE_LEFT,
-    SQUARE_RIGHT,
-    PLUS,
-    MINUS,
-    MULTIPLY,
-    DIVIDE,
-    COMMA,
-    SEMICOLON,
-    COLON,
-    ASSIGN,
-    PERIOD,
-    DOT_DOT,
-    DIV,
-    MOD,
-
-    LESS_OR_EQUAL,
-    LESS_THAN,
-    GREATER_OR_EQUAL,
-    GREATER_THAN,
-    EQUAL,
-    NOT_EQUAL,
-
-    UNRESERVED
-  };
 
   class Token{
     public:
-      Token(TokenType _type, TokenValue _value, int _row, string name);
+      Token(TokenType _type, int _row, string name);
       TokenType getTokenType();
-      TokenValue getTokenValue();
       int getTokenLocation();
       string getTokenName();
       virtual ~Token();
     protected:
       TokenType _type;
-      TokenValue _value;
       int _row;
       string _name;
   };
 
   class Variable: Token{
     public:
-      Variable(TokenType _type, TokenValue _value, int _row, string name, string var_name);
+      Variable(TokenType _type, int _row, string name, string var_name);
       string getVariableName();
       virtual ~Variable();
     protected:
@@ -85,7 +38,7 @@ namespace MiniPascal{
 
   class VariableString: Variable{
     public:
-      VariableString(TokenType _type, TokenValue _value, int _row, string name, string var_name, string value);
+      VariableString(TokenType _type, int _row, string name, string var_name, string value);
       string getVariableValue();
       virtual ~VariableString();
     protected:
@@ -94,7 +47,7 @@ namespace MiniPascal{
 
   class VariableInt: Variable{
     public:
-      VariableInt(TokenType _type, TokenValue _value, int _row, string name, string var_name, int value);
+      VariableInt(TokenType _type, int _row, string name, string var_name, int value);
       int getVariableValue();
       virtual ~VariableInt();
     protected:
