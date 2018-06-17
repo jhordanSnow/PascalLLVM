@@ -9,7 +9,7 @@ class CompoundStatement;
 class Node {
    public:
       Node();
-      execute();
+      void execute();
 };
 
 class Expression;
@@ -18,14 +18,14 @@ class Identifier : public Node {
    public:
       Identifier(std::string identifier);
       std::string identifier;
-      execute();
+      void execute();
 };
 
 class ConstantIdentifier : public Node { 
    public:
       ConstantIdentifier(Identifier* identifier);
       Identifier* identifier;
-      execute();
+      void execute();
 };
 
 class Constant : public Node {
@@ -36,7 +36,7 @@ class Constant : public Node {
       int intConst;
       char charConst;
       ConstantIdentifier* constIdentifier;
-      execute();
+      void execute();
 };
 /* Lexical Grammar */
 
@@ -45,7 +45,7 @@ class TypeIdentifier : public Node {
    public:
       TypeIdentifier(Identifier* identifier);
       Identifier* identifier;
-      execute();
+      void execute();
 };
 
 enum class SimpleType{
@@ -59,7 +59,7 @@ class IndexRange : public Node {
       IndexRange(int begining, int end);
       int begining;
       int end;
-      execute();
+      void execute();
 };
 
 class ArrayType : public Node {
@@ -68,7 +68,7 @@ class ArrayType : public Node {
       ArrayType(IndexRange* indexRange, SimpleType simpleType);
       IndexRange* indexRange;
       SimpleType simpleType;
-      execute();
+      void execute();
 };
 
 class DataType : public Node {
@@ -77,7 +77,7 @@ class DataType : public Node {
       DataType(ArrayType* arrayType);
       SimpleType simpleType;
       ArrayType* arrayType;
-      execute();
+      void execute();
 };
 /* Types */
 
@@ -87,21 +87,21 @@ class VariableIdentifier : public Node {
    public:
       VariableIdentifier(Identifier* variableIdentifier);
       Identifier* variableIdentifier;
-      execute();
+      void execute();
 };
 
 class EntireVariable : public Node {
    public:
       EntireVariable(VariableIdentifier* variableIdentifier);
       VariableIdentifier* variableIdentifier;
-      execute();
+      void execute();
 };
 
 class ArrayVariable : public Node {
    public: 
       ArrayVariable(EntireVariable* entireVariable);
       EntireVariable* entireVariable;
-      execute();
+      void execute();
 };
 
 class IndexedVariable : public Node {
@@ -109,7 +109,7 @@ class IndexedVariable : public Node {
       IndexedVariable(ArrayVariable* arrayVariable, std::list<Expression>* expressionList);
       ArrayVariable* arrayVariable;
       std::list<Expression>* expressionList;
-      execute();
+      void execute();
 };
 
 class VariableNT : public Node {
@@ -118,7 +118,7 @@ class VariableNT : public Node {
       VariableNT(IndexedVariable* indexedVariable);
       EntireVariable* entireVariable;
       IndexedVariable* indexedVariable;
-      execute();
+      void execute();
 };
 
 enum class RelationalOperator{
@@ -147,13 +147,13 @@ enum class Sign {
    NEGATIVE
 };
 
-class AbstractFactor : public Node {execute();
+class AbstractFactor : public Node {void execute();
 };
 class NotFactor : public AbstractFactor {
    public:
       NotFactor(AbstractFactor* factor);
       AbstractFactor* factor;
-      execute();
+      void execute();
 };
 
 class Factor : public AbstractFactor {
@@ -162,7 +162,7 @@ class Factor : public AbstractFactor {
       Factor(Constant* constant);
       VariableNT* variable;
       Constant* constant;
-      execute();
+      void execute();
 };
 
 class Term : public Node {
@@ -170,7 +170,7 @@ class Term : public Node {
       Term(std::list<Factor>* factors, std::list<MultiplicationOperator>* operators);
       std::list<Factor>* factors;
       std::list<MultiplicationOperator>* operators;
-      execute();
+      void execute();
 };
 
 class SimpleExpression : public Node {
@@ -179,7 +179,7 @@ class SimpleExpression : public Node {
       Sign sign;
       std::list<Term>* terms;
       std::list<AdditionOperator>* additionOperators;
-      execute();
+      void execute();
 };
 
 class Expression : public Node {
@@ -189,7 +189,7 @@ class Expression : public Node {
       SimpleExpression* simpleExpression1;
       RelationalOperator relationalOperator;
       SimpleExpression* simpleExpression2;
-      execute();
+      void execute();
 };
 /* Expressions */
 
@@ -201,7 +201,7 @@ class WhileStatement : public Node {
       WhileStatement(Expression* expression, Statement* statement);
       Expression* expression;
       Statement* statement;
-      execute();
+      void execute();
 };
 
 class IfStatement : public Node {
@@ -210,7 +210,7 @@ class IfStatement : public Node {
       Expression* expression;
       Statement* statement;
       Statement* elseStatement;
-      execute();
+      void execute();
 };
 
 class StructuredStatement : public Node {
@@ -221,21 +221,21 @@ class StructuredStatement : public Node {
       CompoundStatement* compoundStatement;
       IfStatement* ifStatement;
       WhileStatement* whileStatement;
-      execute();
+      void execute();
 };
 
 class WriteStatement : public Node {
    public:
       WriteStatement(std::list<VariableNT> variableList);
       std::list<VariableNT> variableList;
-      execute();
+      void execute();
 };
 
 class ReadStatement : public Node {
    public:
       ReadStatement(std::list<VariableNT>* variableList);
       std::list<VariableNT>* variableList;
-      execute();
+      void execute();
 };
 
 class AssignmentStatement : public Node {
@@ -243,7 +243,7 @@ class AssignmentStatement : public Node {
       AssignmentStatement(VariableNT* variable, Expression* expression);
       VariableNT* variable;
       Expression* expression;
-      execute();
+      void execute();
 };
 
 class SimpleStatement : public Node {
@@ -254,7 +254,7 @@ class SimpleStatement : public Node {
       AssignmentStatement* assignmentStatement;
       ReadStatement* readStatement;
       WriteStatement* writeStatement;
-      execute();
+      void execute();
 };
 
 class Statement : public Node {
@@ -263,21 +263,21 @@ class Statement : public Node {
       Statement(StructuredStatement* structuredStatement);
       SimpleStatement* simpleStatement;
       StructuredStatement* structuredStatement;
-      execute();
+      void execute();
 };
 
 class CompoundStatement : public Node {
    public:
-      CompoundStatement(std::list<Statement> statementList);
-      std::list<Statement> statementList;
-      execute();
+      CompoundStatement(std::list<Statement>* statementList);
+      std::list<Statement>* statementList;
+      void execute();
 };
 
 class StatementPart : public Node {
    public:
       StatementPart(CompoundStatement* compoundStatement);
       CompoundStatement* compoundStatement;
-      execute();
+      void execute();
 };
 
 /* Statements */
@@ -287,14 +287,14 @@ class VariableDeclaration : public Node {
       VariableDeclaration(std::list<Identifier>* identifierList, DataType* dataType);
       std::list<Identifier>* identifierList;
       DataType* dataType;
-      execute();
+      void execute();
 };
 
 class VariableDeclarationPart : public Node {
    public:
       VariableDeclarationPart(std::list<VariableDeclaration>* variableDeclarations);
       std::list<VariableDeclaration>* variableDeclarations;
-      execute();
+      void execute();
 };
 
 class Block : public Node {
@@ -302,7 +302,7 @@ class Block : public Node {
       Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* statementPart);
       VariableDeclarationPart* variableDeclarationPart;
       StatementPart* statementPart;
-      execute();
+      void execute();
 };
 
 class Program : public Node {
@@ -310,5 +310,5 @@ class Program : public Node {
       Program(Identifier* identifier, Block* block);
       Identifier* identifier;
       Block* block;
-      execute();
+      void execute();
 };

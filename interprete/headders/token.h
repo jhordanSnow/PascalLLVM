@@ -7,17 +7,10 @@ using namespace std;
 
 namespace MiniPascal{
   enum class TokenType{
-    INTEGER,
-    REAL,
-    BOOLEAN,
-    CHAR,
-    STRING_LITERAL,
-
     IDENTIFIER,
+    DIGIT,
+    SYMBOL,
     KEYWORDS,
-    OPERATORS,
-    DELIMITER,
-    END_OF_FILE,
     UNKNOWN
   };
   enum class TokenValue{

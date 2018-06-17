@@ -154,7 +154,7 @@ Statement::Statement(StructuredStatement* structuredStatement) : Node() {
    this->structuredStatement = structuredStatement;
 }
 
-CompoundStatement::CompoundStatement(std::list<Statement> statementList) : Node() {
+CompoundStatement::CompoundStatement(std::list<Statement>* statementList) : Node() {
    this->statementList = statementList;
 }
 
@@ -176,9 +176,16 @@ Block::Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* st
    this->statementPart = statementPart;
 }
 
+void Block::execute() {
+}
+
 Program::Program(Identifier* identifier, Block* block) : Node() {
    this->identifier = identifier;
    this->block = block;
+}
+
+void Program::execute () {
+   block->execute();
 }
 
 #if false
