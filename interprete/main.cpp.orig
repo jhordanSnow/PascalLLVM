@@ -4,7 +4,6 @@
 #include<list>
 
 #include "headders/lexer.h"
-#include "headders/ast.h"
 
 using namespace std;
 using namespace MiniPascal;
@@ -30,6 +29,7 @@ list<string>* getInputStream(string fileName){
   return code;
 }
 
+<<<<<<< HEAD
 Program* ArbolEjemplo () {
    list<Identifier>* identifierList = new list<Identifier>();
    identifierList->push_front(Identifier("a"));
@@ -69,6 +69,10 @@ Program* ArbolEjemplo () {
    return p;
 }
 
+||||||| merged common ancestors
+=======
+
+>>>>>>> refs/remotes/origin/master
 int main(int argc, char** argv) {
    if (argc != 2) {
       reportError("uso " + string(argv[0]) + " <NombreArchivo>");
