@@ -29,7 +29,7 @@ namespace MiniPascal{
     string endWord = "\n ,"+symbols;
 
     for(this->charIterator = 0; this->charIterator < line.length() - 1; ++this->charIterator){
-      char c = line.at(this->charIterator);
+      char c = tolower(line.at(this->charIterator));
 
       if (this->buffer == "" && this->_state == TokenType::UNKNOWN){
         newState(c);
@@ -66,7 +66,7 @@ namespace MiniPascal{
   void Lexer::makeToken(){
     if (this->buffer != "" && !this->isComment){
       checkKeyword();
-      Token* token = new Token(this->_state, TokenValue::UNRESERVED, this->rowNumber, this->buffer);
+      Token* token = new Token(this->_state, this->rowNumber, this->buffer);
       this->buffer = "";
       this->_state = TokenType::UNKNOWN;
       this->tokens->push_back(token);

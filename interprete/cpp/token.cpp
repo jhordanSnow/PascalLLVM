@@ -1,19 +1,14 @@
 #include "../headders/token.h"
 
 namespace MiniPascal{
-  Token::Token(TokenType _type, TokenValue _value, int _row, string _name){
+  Token::Token(TokenType _type, int _row, string _name){
     this->_type = _type;
-    this->_value = _value;
     this->_row = _row;
     this->_name = _name;
   }
 
   TokenType Token::getTokenType(){
     return _type;
-  }
-
-  TokenValue Token::getTokenValue(){
-    return _value;
   }
 
   int Token::getTokenLocation(){
@@ -26,7 +21,7 @@ namespace MiniPascal{
 
   Token::~Token(){}
 
-  Variable::Variable(TokenType _type, TokenValue _value, int _row, string name, string var_name) : Token(_type, _value, _row, name){
+  Variable::Variable(TokenType _type, int _row, string name, string var_name) : Token(_type, _row, name){
     this->var_name = var_name;
   }
 
@@ -36,7 +31,7 @@ namespace MiniPascal{
 
   Variable::~Variable(){}
 
-  VariableString::VariableString(TokenType _type, TokenValue _value, int _row, string name, string var_name, string value) : Variable(_type, _value, _row, name, var_name){
+  VariableString::VariableString(TokenType _type, int _row, string name, string var_name, string value) : Variable(_type, _row, name, var_name){
     this->value = value;
   }
 
@@ -46,7 +41,7 @@ namespace MiniPascal{
 
   VariableString::~VariableString(){}
 
-  VariableInt::VariableInt(TokenType _type, TokenValue _value, int _row, string name, string var_name, int value) : Variable(_type, _value, _row, name, var_name){
+  VariableInt::VariableInt(TokenType _type, int _row, string name, string var_name, int value) : Variable(_type, _row, name, var_name){
     this->value = value;
   }
 
