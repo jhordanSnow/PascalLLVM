@@ -5,6 +5,7 @@
 
 #include "headders/lexer.h"
 #include "headders/ast.h"
+#include "headders/analizadorSintactico.h"
 
 using namespace std;
 using namespace MiniPascal;
@@ -89,6 +90,8 @@ int main(int argc, char** argv) {
 
    Program* p = ArbolEjemplo();
    cout << "identificador" << p->identifier->identifier << endl;
+
+   AnalizadorSintactico::analizar(tokens);
 
    return 0;
 }

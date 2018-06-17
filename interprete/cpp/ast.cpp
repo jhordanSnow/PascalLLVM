@@ -171,6 +171,8 @@ VariableDeclarationPart::VariableDeclarationPart(std::list<VariableDeclaration>*
    this->variableDeclarations = variableDeclarations;
 }
 
+VariableDeclarationPart::VariableDeclarationPart() : Node() {}
+
 Block::Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* statementPart) : Node() {
    this->variableDeclarationPart = variableDeclarationPart;
    this->statementPart = statementPart;

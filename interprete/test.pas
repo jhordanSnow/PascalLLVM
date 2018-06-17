@@ -1,15 +1,10 @@
-program foo(boo);
+program foo;
 // variables globales
 var a, b, c, d: integer;
 
-function addition(a, b: integer) : integer;
-   var c: Integer;
-   Begin
-      return a + b
-   end;
-
 // compound statements: "main"
 Begin
-   a := addition(1, 2);
-   putchar(a)
+   read(a, b, c, d)
+   a := (b+c)*d div a
+   write(a)
 end.

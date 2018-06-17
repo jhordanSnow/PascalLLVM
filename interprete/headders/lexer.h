@@ -1,3 +1,6 @@
+#ifndef LEXER_H_
+#define LEXER_H_
+
 #include<list>
 #include "token.h"
 
@@ -21,3 +24,4 @@ namespace MiniPascal{
       bool isComment;
   };
 };
+#endif

@@ -1,3 +1,6 @@
+#ifndef AST_H_
+#define AST_H_
+
 #include<string>
 #include<list>
 
@@ -293,6 +296,7 @@ class VariableDeclaration : public Node {
 class VariableDeclarationPart : public Node {
    public:
       VariableDeclarationPart(std::list<VariableDeclaration>* variableDeclarations);
+      VariableDeclarationPart();
       std::list<VariableDeclaration>* variableDeclarations;
       void execute();
 };
@@ -312,3 +316,4 @@ class Program : public Node {
       Block* block;
       void execute();
 };
+#endif
