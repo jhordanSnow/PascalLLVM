@@ -1,6 +1,6 @@
 program foo;
 // variables globales
-var a, b, c, d: integer;
+var a, b, c, d: integer; e: char;
 
 // compound statements: "main"
 Begin

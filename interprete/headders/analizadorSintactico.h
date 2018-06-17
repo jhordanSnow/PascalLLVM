@@ -16,5 +16,8 @@ class AnalizadorSintactico {
       static Block* block(list<Token*>* tokenList);
       static Identifier* identifier(list<Token*>* tokenList);
       static VariableDeclarationPart* variableDeclarationPart(list<Token*>* tokenList);
+      static list<VariableDeclaration*>* variableDeclarations(list<Token*>* tokenList);
+      static VariableDeclaration* variableDeclaration(list<Token*>* tokenList);
+      static std::list<Identifier*>* optionalVariableDeclarations(list<Token*>* tokenList, std::list<Identifier*>* identifierList);
 };
 #endif
