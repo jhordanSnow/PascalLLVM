@@ -24,7 +24,7 @@ class Identifier : public Node {
       void execute();
 };
 
-class ConstantIdentifier : public Node { 
+class ConstantIdentifier : public Node {
    public:
       ConstantIdentifier(Identifier* identifier);
       Identifier* identifier;
@@ -101,7 +101,7 @@ class EntireVariable : public Node {
 };
 
 class ArrayVariable : public Node {
-   public: 
+   public:
       ArrayVariable(EntireVariable* entireVariable);
       EntireVariable* entireVariable;
       void execute();

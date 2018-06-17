@@ -25,7 +25,7 @@ namespace MiniPascal{
   }
 
   void Lexer::getTokensInLine(string line){
-    string symbols = ",;():+-*[]=<>/\"";
+    string symbols = ",;():+-*[]=<>/\"\'";
     string endWord = "\n ,"+symbols;
 
     for(this->charIterator = 0; this->charIterator < line.length() - 1; ++this->charIterator){
