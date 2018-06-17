@@ -58,7 +58,7 @@ ArrayVariable::ArrayVariable(EntireVariable* entireVariable) : Node() {
    this->entireVariable = entireVariable;
 }
 
-IndexedVariable::IndexedVariable(ArrayVariable* arrayVariable, std::list<Expression>* expressionList) : Node() {
+IndexedVariable::IndexedVariable(ArrayVariable* arrayVariable, std::list<Expression*>* expressionList) : Node() {
    this->arrayVariable = arrayVariable;
    this->expressionList = expressionList;
 }
@@ -83,12 +83,12 @@ Factor::Factor(Constant* constant) : AbstractFactor() {
    this->constant = constant;
 }
 
-Term::Term(std::list<Factor>* factors, std::list<MultiplicationOperator>* operators) : Node() {
+Term::Term(std::list<Factor*>* factors, std::list<MultiplicationOperator*>* operators) : Node() {
    this->factors = factors;
    this->operators = operators;
 }
 
-SimpleExpression::SimpleExpression(Sign sign, std::list<Term>* terms, std::list<AdditionOperator>* additionOperators) : Node() {
+SimpleExpression::SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator*>* additionOperators) : Node() {
    this->sign = sign;
    this->terms = terms;
    this->additionOperators = additionOperators;
@@ -125,7 +125,7 @@ WriteStatement::WriteStatement(std::list<VariableNT> variableList) : Node() {
    this->variableList = variableList;
 }
 
-ReadStatement::ReadStatement(std::list<VariableNT>* variableList) : Node() {
+ReadStatement::ReadStatement(std::list<VariableNT*>* variableList) : Node() {
    this->variableList = variableList;
 }
 
@@ -154,20 +154,35 @@ Statement::Statement(StructuredStatement* structuredStatement) : Node() {
    this->structuredStatement = structuredStatement;
 }
 
-CompoundStatement::CompoundStatement(std::list<Statement>* statementList) : Node() {
+void Statement::execute() {
+   
+}
+
+CompoundStatement::CompoundStatement(std::list<Statement*>* statementList) : Node() {
    this->statementList = statementList;
+}
+
+void CompoundStatement::execute() {
+   for (std::list<Statement*>::iterator it = this->statementList->begin(); it != this->statementList->end(); ++it) {
+      Statement* s = (*it);
+      s->execute();
+   }
 }
 
 StatementPart::StatementPart(CompoundStatement* compoundStatement) : Node() {
    this->compoundStatement = compoundStatement;
 }
 
-VariableDeclaration::VariableDeclaration(std::list<Identifier>* identifierList, DataType* dataType) : Node() {
+void StatementPart::execute() {
+   this->compoundStatement->execute();
+}
+
+VariableDeclaration::VariableDeclaration(std::list<Identifier*>* identifierList, DataType* dataType) : Node() {
    this->identifierList = identifierList;
    this->dataType = dataType;
 }
 
-VariableDeclarationPart::VariableDeclarationPart(std::list<VariableDeclaration>* variableDeclarations) : Node() {
+VariableDeclarationPart::VariableDeclarationPart(std::list<VariableDeclaration*>* variableDeclarations) : Node() {
    this->variableDeclarations = variableDeclarations;
 }
 

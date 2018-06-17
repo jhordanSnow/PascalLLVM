@@ -109,9 +109,9 @@ class ArrayVariable : public Node {
 
 class IndexedVariable : public Node {
    public:
-      IndexedVariable(ArrayVariable* arrayVariable, std::list<Expression>* expressionList);
+      IndexedVariable(ArrayVariable* arrayVariable, std::list<Expression*>* expressionList);
       ArrayVariable* arrayVariable;
-      std::list<Expression>* expressionList;
+      std::list<Expression*>* expressionList;
       void execute();
 };
 
@@ -170,18 +170,18 @@ class Factor : public AbstractFactor {
 
 class Term : public Node {
    public:
-      Term(std::list<Factor>* factors, std::list<MultiplicationOperator>* operators);
-      std::list<Factor>* factors;
-      std::list<MultiplicationOperator>* operators;
+      Term(std::list<Factor*>* factors, std::list<MultiplicationOperator*>* operators);
+      std::list<Factor*>* factors;
+      std::list<MultiplicationOperator*>* operators;
       void execute();
 };
 
 class SimpleExpression : public Node {
    public:
-      SimpleExpression(Sign sign, std::list<Term>* terms, std::list<AdditionOperator>* additionOperators);
+      SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator*>* additionOperators);
       Sign sign;
-      std::list<Term>* terms;
-      std::list<AdditionOperator>* additionOperators;
+      std::list<Term*>* terms;
+      std::list<AdditionOperator*>* additionOperators;
       void execute();
 };
 
@@ -236,8 +236,8 @@ class WriteStatement : public Node {
 
 class ReadStatement : public Node {
    public:
-      ReadStatement(std::list<VariableNT>* variableList);
-      std::list<VariableNT>* variableList;
+      ReadStatement(std::list<VariableNT*>* variableList);
+      std::list<VariableNT*>* variableList;
       void execute();
 };
 
@@ -271,8 +271,8 @@ class Statement : public Node {
 
 class CompoundStatement : public Node {
    public:
-      CompoundStatement(std::list<Statement>* statementList);
-      std::list<Statement>* statementList;
+      CompoundStatement(std::list<Statement*>* statementList);
+      std::list<Statement*>* statementList;
       void execute();
 };
 
@@ -287,17 +287,17 @@ class StatementPart : public Node {
 
 class VariableDeclaration : public Node {
    public:
-      VariableDeclaration(std::list<Identifier>* identifierList, DataType* dataType);
-      std::list<Identifier>* identifierList;
+      VariableDeclaration(std::list<Identifier*>* identifierList, DataType* dataType);
+      std::list<Identifier*>* identifierList;
       DataType* dataType;
       void execute();
 };
 
 class VariableDeclarationPart : public Node {
    public:
-      VariableDeclarationPart(std::list<VariableDeclaration>* variableDeclarations);
+      VariableDeclarationPart(std::list<VariableDeclaration*>* variableDeclarations);
       VariableDeclarationPart();
-      std::list<VariableDeclaration>* variableDeclarations;
+      std::list<VariableDeclaration*>* variableDeclarations;
       void execute();
 };
 

@@ -32,24 +32,24 @@ list<string>* getInputStream(string fileName){
 }
 
 Program* ArbolEjemplo () {
-   list<Identifier>* identifierList = new list<Identifier>();
-   identifierList->push_front(Identifier("a"));
-   identifierList->push_front(Identifier("b"));
-   identifierList->push_front(Identifier("c"));
-   identifierList->push_front(Identifier("d"));
+   list<Identifier*>* identifierList = new list<Identifier*>();
+   identifierList->push_front(new Identifier("a"));
+   identifierList->push_front(new Identifier("b"));
+   identifierList->push_front(new Identifier("c"));
+   identifierList->push_front(new Identifier("d"));
 
-   list<VariableDeclaration>* variableDeclarationsList = new list<VariableDeclaration>();
-   variableDeclarationsList->push_front(VariableDeclaration(identifierList, new DataType(SimpleType::INTEGER)));
+   list<VariableDeclaration*>* variableDeclarationsList = new list<VariableDeclaration*>();
+   variableDeclarationsList->push_front(new VariableDeclaration(identifierList, new DataType(SimpleType::INTEGER)));
 
-   list<VariableNT>* variableListRead = new list<VariableNT>();
-   variableListRead->push_front(VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("a")))));
-   variableListRead->push_front(VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("b")))));
-   variableListRead->push_front(VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("c")))));
-   variableListRead->push_front(VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("d")))));
+   list<VariableNT*>* variableListRead = new list<VariableNT*>();
+   variableListRead->push_front(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("a")))));
+   variableListRead->push_front(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("b")))));
+   variableListRead->push_front(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("c")))));
+   variableListRead->push_front(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("d")))));
 
-   list<Statement>* statementList = new list<Statement>();
+   list<Statement*>* statementList = new list<Statement*>();
    statementList->push_front(
-         Statement(
+         new Statement(
             new SimpleStatement(
                new ReadStatement(
                      variableListRead
