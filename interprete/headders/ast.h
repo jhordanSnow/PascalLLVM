@@ -3,6 +3,7 @@
 
 #include<string>
 #include<list>
+#include<headders/env.h>
 
 // Forward Declarations
 class Block;
@@ -34,10 +35,10 @@ class ConstantIdentifier : public Node {
 class Constant : public Node {
    public:
       Constant(int intConst);
-      Constant(char charConst);
+      Constant(std::string stringConst);
       Constant(ConstantIdentifier* constIdentifier);
       int intConst;
-      char charConst;
+      std::string stringConst;
       ConstantIdentifier* constIdentifier;
       void execute();
 };

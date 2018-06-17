@@ -16,8 +16,8 @@ Constant::Constant(int intConst) : Node() {
    this->intConst = intConst;
 }
 
-Constant::Constant(char charConst) : Node() {
-   this->charConst = charConst;
+Constant::Constant(std::string stringConst) : Node() {
+   this->stringConst = stringConst;
 }
 
 TypeIdentifier::TypeIdentifier(Identifier* identifier) : Node() {
@@ -115,18 +115,32 @@ StructuredStatement::StructuredStatement(CompoundStatement* compoundStatement) :
 
 StructuredStatement::StructuredStatement(IfStatement* ifStatement) : Node() {
    this->ifStatement = ifStatement;
+   this->whileStatement = 0;
 }
 
 StructuredStatement::StructuredStatement(WhileStatement* whileStatement) : Node() {
    this->whileStatement = whileStatement;
+   this->ifStatement = 0;
+}
+
+void StructuredStatement::execute() {
+   // FALTA
 }
 
 WriteStatement::WriteStatement(std::list<VariableNT> variableList) : Node() {
    this->variableList = variableList;
 }
 
+void WriteStatement::execute() {
+   //FALTA EL DICCIONARIO
+}
+
 ReadStatement::ReadStatement(std::list<VariableNT*>* variableList) : Node() {
    this->variableList = variableList;
+}
+
+void ReadStatement::execute() {
+   // FALTA EL DICCIONARIO
 }
 
 AssignmentStatement::AssignmentStatement(VariableNT* variable, Expression* expression) : Node() {
@@ -134,28 +148,54 @@ AssignmentStatement::AssignmentStatement(VariableNT* variable, Expression* expre
    this->expression = expression;
 }
 
+void AssignmentStatement::execute() {
+   // FALTA EXPRESSION
+}
+
 SimpleStatement::SimpleStatement(AssignmentStatement* assignmentStatement) : Node() {
    this->assignmentStatement = assignmentStatement;
+   this->readStatement = 0;
+   this->writeStatement = 0;
 }
 
 SimpleStatement::SimpleStatement(ReadStatement* readStatement) : Node() {
    this->readStatement = readStatement;
+   this->writeStatement = 0;
+   this->assignmentStatement = 0;
 }
 
 SimpleStatement::SimpleStatement(WriteStatement* writeStatement) : Node() {
    this->writeStatement = writeStatement;
+   this->readStatement = 0;
+   this->assignmentStatement = 0;
+}
+
+void SimpleStatement::execute() {
+   if (assignmentStatement != 0) {
+      this->assignmentStatement->execute();
+   } else if (readStatement != 0) {
+      this->readStatement->execute();
+   } else if (writeStatement != 0) {
+      this->writeStatement->execute();
+   }
 }
 
 Statement::Statement(SimpleStatement* simpleStatement) : Node() {
    this->simpleStatement = simpleStatement;
+   this->structuredStatement = 0;
 }
 
 Statement::Statement(StructuredStatement* structuredStatement) : Node() {
    this->structuredStatement = structuredStatement;
+   this->simpleStatement = 0;
 }
 
 void Statement::execute() {
-   
+   if (this->simpleStatement != 0) {
+      this->simpleStatement->execute();
+   } else {
+      this->structuredStatement->execute();
+   }
 }
 
 CompoundStatement::CompoundStatement(std::list<Statement*>* statementList) : Node() {
@@ -182,11 +222,24 @@ VariableDeclaration::VariableDeclaration(std::list<Identifier*>* identifierList,
    this->dataType = dataType;
 }
 
+void VariableDeclaration::execute() {
+   //Enviroment* env = Enviroment::getInstance();
+}
+
 VariableDeclarationPart::VariableDeclarationPart(std::list<VariableDeclaration*>* variableDeclarations) : Node() {
    this->variableDeclarations = variableDeclarations;
 }
 
-VariableDeclarationPart::VariableDeclarationPart() : Node() {}
+VariableDeclarationPart::VariableDeclarationPart() : Node() {
+   this->variableDeclarations = 0;
+}
+
+void VariableDeclarationPart::execute() {
+   for (std::list<VariableDeclaration*>::iterator it = this->variableDeclarations->begin(); it != this->variableDeclarations->end(); ++it){
+      VariableDeclaration* varDeclaration = (*it);
+      varDeclaration->execute();
+   }
+}
 
 Block::Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* statementPart) : Node() {
    this->variableDeclarationPart = variableDeclarationPart;
@@ -194,6 +247,8 @@ Block::Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* st
 }
 
 void Block::execute() {
+   this->variableDeclarationPart->execute();
+   this->statementPart->execute();
 }
 
 Program::Program(Identifier* identifier, Block* block) : Node() {
