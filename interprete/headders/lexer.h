@@ -10,12 +10,14 @@ namespace MiniPascal{
       void makeToken();
       void newState(char character);
       void checkKeyword();
-      void makeTokenSymbol(char character);
+      void makeTokenSymbol(char character, char nextChar);
       virtual ~Lexer();
     private:
       string buffer;
       TokenType _state;
       int rowNumber;
       list<Token*>* tokens;
+      unsigned int charIterator;
+      bool isComment;
   };
 };

@@ -11,10 +11,13 @@ namespace MiniPascal{
     this->_state = TokenType::UNKNOWN;
     this->rowNumber = 1;
     this->buffer = "";
+    this->isComment = false;
   }
 
   list<Token*>* Lexer::tokenize(list<string>* code){
     for (list<string>::iterator line = code->begin(); line != code->end(); ++line){
+      this->isComment = false;
+      this->buffer = "";
       getTokensInLine(*line + " ");
       this->rowNumber++;
     }
@@ -22,12 +25,11 @@ namespace MiniPascal{
   }
 
   void Lexer::getTokensInLine(string line){
-    string symbols = ",;():+-*[]=<>";
+    string symbols = ",;():+-*[]=<>/\"";
     string endWord = "\n ,"+symbols;
-    string doubleDelimeters = ":=..//";
 
-    for(unsigned i=0; i < line.length(); ++i){
-      char c = line.at(i);
+    for(this->charIterator = 0; this->charIterator < line.length() - 1; ++this->charIterator){
+      char c = line.at(this->charIterator);
 
       if (this->buffer == "" && this->_state == TokenType::UNKNOWN){
         newState(c);
@@ -37,7 +39,7 @@ namespace MiniPascal{
       if (endWord.find(string(1, c)) != string::npos){
         makeToken();
         if (symbols.find(string(1, c)) != string::npos){
-          makeTokenSymbol(c);
+          makeTokenSymbol(c, line.at(this->charIterator+1));
         }
       }else{
         this->buffer += c;
@@ -45,14 +47,24 @@ namespace MiniPascal{
     }
   }
 
-  void Lexer::makeTokenSymbol(char character){
+  void Lexer::makeTokenSymbol(char character, char nextChar){
+    string doubleSymbols[] = {":=", "..", "//", "<>", "<=", ">="};
+    string dSymbol = string(1, character) + string(1, nextChar);
     this->buffer = string(1, character);
+    if (find(begin(doubleSymbols), end(doubleSymbols), dSymbol) != end(doubleSymbols)){
+      this->buffer += nextChar;
+      this->_state = TokenType::KEYWORDS;
+      this->charIterator += 1;
+      if (dSymbol == "//"){
+        this->isComment = true;
+      }
+    }
     this->_state = TokenType::SYMBOL;
     makeToken();
   }
 
   void Lexer::makeToken(){
-    if (this->buffer != ""){
+    if (this->buffer != "" && !this->isComment){
       checkKeyword();
       Token* token = new Token(this->_state, TokenValue::UNRESERVED, this->rowNumber, this->buffer);
       this->buffer = "";
@@ -64,7 +76,6 @@ namespace MiniPascal{
   void Lexer::checkKeyword(){
     string keywords[] = {"div","or","and","not","if","then","else","of","while","do","begin","end","read","write","var","array","function ","procedure","program","true","false","char","integer","boolean"};
     if (find(begin(keywords), end(keywords), this->buffer) != end(keywords)){
-      cout << "caca: " << this->buffer << "\n";
       this->_state = TokenType::KEYWORDS;
     }
   }
