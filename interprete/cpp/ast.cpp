@@ -1,6 +1,7 @@
 #include <headders/ast.h>
 #include<string>
 #include<list>
+#include<limits>
 
 Node::Node() {}
 
@@ -40,6 +41,7 @@ ArrayType::ArrayType(IndexRange* indexRange, SimpleType simpleType) : Node() {
 
 DataType::DataType(SimpleType simpleType) : Node() {
    this->simpleType = simpleType;
+   this->arrayType = 0;
 }
 
 DataType::DataType(ArrayType* arrayType) : Node() {
@@ -65,10 +67,12 @@ IndexedVariable::IndexedVariable(ArrayVariable* arrayVariable, Expression* expre
 
 VariableNT::VariableNT(EntireVariable* entireVariable) : Node() {
    this->entireVariable = entireVariable;
+   this->indexedVariable = 0;
 }
 
 VariableNT::VariableNT(IndexedVariable* indexedVariable) : Node() {
    this->indexedVariable = indexedVariable;
+   this->entireVariable = 0;
 }
 
 NotFactor::NotFactor(AbstractFactor* factor) : AbstractFactor() {
@@ -77,10 +81,12 @@ NotFactor::NotFactor(AbstractFactor* factor) : AbstractFactor() {
 
 Factor::Factor(VariableNT* variable) : AbstractFactor() {
    this->variable = variable;
+   this->constant = 0;
 }
 
 Factor::Factor(Constant* constant) : AbstractFactor() {
    this->constant = constant;
+   this->variable = 0;
 }
 
 Term::Term(std::list<AbstractFactor*>* factors, std::list<MultiplicationOperator>* operators) : Node() {
@@ -96,6 +102,7 @@ SimpleExpression::SimpleExpression(Sign sign, std::list<Term*>* terms, std::list
 
 Expression::Expression(SimpleExpression* simpleExpression1) : Node() {
    this->simpleExpression1 = simpleExpression1;
+   this->simpleExpression2 = 0;
 }
 
 Expression::Expression(SimpleExpression* simpleExpression1, RelationalOperator relationalOperator, SimpleExpression* simpleExpression2) : Node() {
@@ -111,15 +118,19 @@ WhileStatement::WhileStatement(Expression* expression, Statement* statement) : N
 
 StructuredStatement::StructuredStatement(CompoundStatement* compoundStatement) : Node() {
    this->compoundStatement = compoundStatement;
+   this->whileStatement = 0;
+   this->ifStatement = 0;
 }
 
 StructuredStatement::StructuredStatement(IfStatement* ifStatement) : Node() {
    this->ifStatement = ifStatement;
+   this->compoundStatement = 0;
    this->whileStatement = 0;
 }
 
 StructuredStatement::StructuredStatement(WhileStatement* whileStatement) : Node() {
    this->whileStatement = whileStatement;
+   this->compoundStatement = 0;
    this->ifStatement = 0;
 }
 
@@ -132,7 +143,9 @@ WriteStatement::WriteStatement(std::list<VariableNT*>* variableList) : Node() {
 }
 
 void WriteStatement::execute() {
-   //FALTA EL DICCIONARIO
+   for (std::list<VariableNT*>::iterator it = this->variableList->begin(); it != this->variableList->end(); ++it) {
+      std::cout << "Read Statement (BORRAR ESTO)" << endl;
+   }
 }
 
 ReadStatement::ReadStatement(std::list<VariableNT*>* variableList) : Node() {
@@ -140,7 +153,51 @@ ReadStatement::ReadStatement(std::list<VariableNT*>* variableList) : Node() {
 }
 
 void ReadStatement::execute() {
-   // FALTA EL DICCIONARIO
+   for (std::list<VariableNT*>::iterator it = this->variableList->begin(); it != this->variableList->end(); ++it) {
+      Enviroment* env = Enviroment::getInstance();
+      VariableNT* requestedVar = (*it);
+
+      if (requestedVar->entireVariable != 0) {
+         EnvVariable* var = env->getVariable(requestedVar->entireVariable->variableIdentifier->variableIdentifier->identifier);
+         int varType = var->getType();
+         if (varType == 1) { // int
+            IntVariable* intVar = (IntVariable*)var;
+            int newVar = 0;
+            cout << "int: ";
+            while(!(cin >> newVar)){
+               cout << "Valor debe ser un int" << endl;
+               cout << "int: ";
+               cin.clear();
+               cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+            intVar->setValue(newVar);
+         } else if (varType == 2) { // string
+            BoolVariable* boolVar = (BoolVariable*)var;
+            bool newVar = false;
+            cout << "boolean: ";
+            while(!(cin >> newVar)){
+               cout << "el valor debe ser un string." << endl;
+               cout << "boolean: ";
+               cin.clear();
+               cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+            boolVar->setValue(newVar);
+         } else if (varType == 3) { // boolean 
+            StringVariable* stringVar = (StringVariable*)var;
+            string newVar = "";
+            cout << "booleano(1/0): ";
+            while (!(cin >> newVar)) {
+               cout << "el valor debe ser un booleano." << endl;
+               cout << "booleano(1/0): ";
+               cin.clear();
+               cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+            stringVar->setValue(newVar);
+         }
+      } else { // indexed variable
+         //EnvVariable* var = env->getVariable(requestedVar->indexedVariable->arrayVariabl->entireVariable->variableIdentifier->variableIdentifier->identifier);
+      }
+   }
 }
 
 AssignmentStatement::AssignmentStatement(VariableNT* variable, Expression* expression) : Node() {
@@ -223,7 +280,33 @@ VariableDeclaration::VariableDeclaration(std::list<Identifier*>* identifierList,
 }
 
 void VariableDeclaration::execute() {
-   //Enviroment* env = Enviroment::getInstance();
+   Enviroment* env = Enviroment::getInstance();
+   DataType* dt = this->dataType;
+   if (dt->arrayType == 0) { // si es un tipo simple
+      for (std::list<Identifier*>::iterator it = this->identifierList->begin(); it != this->identifierList->end(); ++it) {
+         Identifier* id = (*it);
+         if (dt->simpleType == SimpleType::INTEGER){
+            env->addInt(id->identifier, 0);
+         } else if (dt->simpleType == SimpleType::CHAR) {
+            env->addString(id->identifier, "");
+         } else if (dt->simpleType == SimpleType::BOOLEAN) {
+            env->addBool(id->identifier, false);
+         } 
+      }
+   } else { // si es un tipo array
+      for (std::list<Identifier*>::iterator it = this->identifierList->begin(); it != this->identifierList->end(); ++it) {
+         Identifier* id = (*it);
+         ArrayType* at = dt->arrayType;
+         IndexRange* ir = at->indexRange;
+         if (at->simpleType == SimpleType::INTEGER){
+            env->addArray(id->identifier, ir->begining, ir->end, 1);
+         } else if (at->simpleType == SimpleType::CHAR) {
+            env->addArray(id->identifier, ir->begining, ir->end, 2);
+         } else if (at->simpleType == SimpleType::BOOLEAN) {
+            env->addArray(id->identifier, ir->begining, ir->end, 3);
+         }
+      }
+   }
 }
 
 VariableDeclarationPart::VariableDeclarationPart(std::list<VariableDeclaration*>* variableDeclarations) : Node() {
