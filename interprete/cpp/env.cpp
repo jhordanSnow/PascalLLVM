@@ -87,6 +87,34 @@ ArrayVariableEnv::ArrayVariableEnv(string identifier, int begining, int end, int
    }
 }
 
+int ArrayVariableEnv::getType() {
+   return this->type;
+}
+
+int ArrayVariableEnv::getInt(int index) {
+   return intArray[index];
+}
+
+string ArrayVariableEnv::getString(int index) {
+   return stringArray[index];
+}
+
+bool ArrayVariableEnv::getBool(int index) {
+   return boolArray[this->begining + index];
+}
+
+void ArrayVariableEnv::setInt(int index, int value) {
+   this->intArray[this->begining + index] = value;
+}
+
+void ArrayVariableEnv::setString(int index, string value) {
+   this->stringArray[this->begining + index] = value;
+}
+
+void ArrayVariableEnv::setBool(int index, bool value) {
+  this->boolArray[index] = value;
+}
+
 string ArrayVariableEnv::toString() {
    char buffer [40];
    sprintf(buffer, "Array: type=%i; range=[%i-%i]", type, begining, end);

@@ -6,6 +6,7 @@
 #include "headders/lexer.h"
 #include "headders/ast.h"
 #include "headders/analizadorSintactico.h"
+#include "headders/env.h"
 
 using namespace std;
 using namespace MiniPascal;
@@ -39,16 +40,17 @@ Program* ArbolEjemplo () {
    identifierList->push_front(new Identifier("d"));
 
    list<VariableDeclaration*>* variableDeclarationsList = new list<VariableDeclaration*>();
-   variableDeclarationsList->push_front(new VariableDeclaration(identifierList, new DataType(SimpleType::INTEGER)));
+   //variableDeclarationsList->push_front(new VariableDeclaration(identifierList, new DataType(new ArrayType(new IndexRange(1, 100), SimpleType::INTEGER)))); //Array type
+   variableDeclarationsList->push_front(new VariableDeclaration(identifierList, new DataType(SimpleType::INTEGER))); //SimpleType
 
    list<VariableNT*>* variableListRead = new list<VariableNT*>();
-   variableListRead->push_front(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("a")))));
-   variableListRead->push_front(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("b")))));
-   variableListRead->push_front(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("c")))));
-   variableListRead->push_front(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("d")))));
+   variableListRead->push_back(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("a")))));
+   variableListRead->push_back(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("b")))));
+   variableListRead->push_back(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("c")))));
+   variableListRead->push_back(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("d")))));
 
    list<Statement*>* statementList = new list<Statement*>();
-   statementList->push_front(
+   statementList->push_back(
          new Statement(
             new SimpleStatement(
                new ReadStatement(
@@ -57,6 +59,25 @@ Program* ArbolEjemplo () {
                )
             )
          );
+
+
+   statementList->push_back(
+         new Statement(
+            new SimpleStatement(
+               new WriteStatement(
+                     variableListRead
+                  )
+               )
+            )
+         );
+
+   VariableDeclarationPart* vdp = new VariableDeclarationPart(variableDeclarationsList);
+   vdp->execute();
+
+   StatementPart* sp = new StatementPart(new CompoundStatement(statementList));
+   sp->execute();
+
+   Enviroment::getInstance()->print();
 
    Program* p = new Program(
          new Identifier("ejemplo"),

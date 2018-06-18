@@ -60,9 +60,9 @@ ArrayVariable::ArrayVariable(EntireVariable* entireVariable) : Node() {
    this->entireVariable = entireVariable;
 }
 
-IndexedVariable::IndexedVariable(ArrayVariable* arrayVariable, Expression* expressionList) : Node() {
+IndexedVariable::IndexedVariable(ArrayVariable* arrayVariable, Expression* expression) : Node() {
    this->arrayVariable = arrayVariable;
-   this->expressionList = expressionList;
+   this->expression = expression;
 }
 
 VariableNT::VariableNT(EntireVariable* entireVariable) : Node() {
@@ -144,7 +144,26 @@ WriteStatement::WriteStatement(std::list<VariableNT*>* variableList) : Node() {
 
 void WriteStatement::execute() {
    for (std::list<VariableNT*>::iterator it = this->variableList->begin(); it != this->variableList->end(); ++it) {
-      std::cout << "Read Statement (BORRAR ESTO)" << endl;
+      Enviroment* env = Enviroment::getInstance();
+      VariableNT* requestedVar = (*it);
+
+      if (requestedVar->entireVariable != 0) {
+         EnvVariable* var = env->getVariable(requestedVar->entireVariable->variableIdentifier->variableIdentifier->identifier);
+         int varType = var->getType();
+         if (varType == 1) { // int
+            IntVariable* intVar = (IntVariable*)var;
+            cout << intVar->toString() << endl;
+         } else if (varType == 2) { // string
+            BoolVariable* boolVar = (BoolVariable*)var;
+            cout << boolVar->toString() << endl;
+         } else if (varType == 3) { // boolean 
+            StringVariable* stringVar = (StringVariable*)var;
+            cout << stringVar->toString() << endl;
+         }
+      } else { // indexed variable
+         //EnvVariable* var = env->getVariable(requestedVar->indexedVariable->arrayVariabl->entireVariable->variableIdentifier->variableIdentifier->identifier);
+         // FALTA EXPRESSION
+      }
    }
 }
 
@@ -171,31 +190,63 @@ void ReadStatement::execute() {
                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
             intVar->setValue(newVar);
-         } else if (varType == 2) { // string
+         } else if (varType == 2) { // boolean
             BoolVariable* boolVar = (BoolVariable*)var;
             bool newVar = false;
-            cout << "boolean: ";
+            cout << "boolean(1/0): ";
             while(!(cin >> newVar)){
-               cout << "el valor debe ser un string." << endl;
-               cout << "boolean: ";
+               cout << "el valor debe ser un booleano(1/0)." << endl;
+               cout << "boolean(1/0): ";
                cin.clear();
                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
             boolVar->setValue(newVar);
-         } else if (varType == 3) { // boolean 
+         } else if (varType == 3) { // string 
             StringVariable* stringVar = (StringVariable*)var;
             string newVar = "";
-            cout << "booleano(1/0): ";
+            cout << "string: ";
             while (!(cin >> newVar)) {
-               cout << "el valor debe ser un booleano." << endl;
-               cout << "booleano(1/0): ";
+               cout << "el valor debe ser un string." << endl;
+               cout << "string: ";
                cin.clear();
                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
             stringVar->setValue(newVar);
          }
-      } else { // indexed variable
-         //EnvVariable* var = env->getVariable(requestedVar->indexedVariable->arrayVariabl->entireVariable->variableIdentifier->variableIdentifier->identifier);
+      } else { // indexed variable // FALTA Cambiar los 1 por expression
+         ArrayVariableEnv* var = (ArrayVariableEnv*)env->getVariable(requestedVar->indexedVariable->arrayVariable->entireVariable->variableIdentifier->variableIdentifier->identifier);
+         int varType = var->getType();
+         if (varType == 1) { // int
+            int newVar = 0;
+            cout << "int: ";
+            while(!(cin >> newVar)){
+               cout << "Valor debe ser un int" << endl;
+               cout << "int: ";
+               cin.clear();
+               cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+            var->setInt(1, newVar);
+         } else if (varType == 2) { // boolean
+            bool newVar = false;
+            cout << "boolean(1/0): ";
+            while(!(cin >> newVar)){
+               cout << "el valor debe ser un booleano(1/0)." << endl;
+               cout << "boolean(1/0): ";
+               cin.clear();
+               cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+            var->setBool(1, newVar);
+         } else if (varType == 3) { // string 
+            string newVar = "";
+            cout << "string: ";
+            while (!(cin >> newVar)) {
+               cout << "el valor debe ser un string." << endl;
+               cout << "string: ";
+               cin.clear();
+               cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+            var->setString(1, newVar);
+         }
       }
    }
 }

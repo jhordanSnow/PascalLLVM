@@ -51,7 +51,16 @@ class BoolVariable : public EnvVariable {
 class ArrayVariableEnv : public EnvVariable {
    public:
       ArrayVariableEnv(string identifier, int begining, int end, int type);
+      int getType();
+      int getInt(int index);
+      string getString(int index);
+      bool getBool(int index);
+
+      void setInt(int index, int value);
+      void setString(int index, string value);
+      void setBool(int index, bool value);
       string toString();
+   protected:
       int type;
       int begining;
       int end;
