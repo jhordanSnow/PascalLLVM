@@ -3,7 +3,6 @@
 
 #include<string>
 #include<list>
-#include<headders/env.h>
 
 // Forward Declarations
 class Block;
@@ -110,9 +109,9 @@ class ArrayVariable : public Node {
 
 class IndexedVariable : public Node {
    public:
-      IndexedVariable(ArrayVariable* arrayVariable, std::list<Expression*>* expressionList);
+      IndexedVariable(ArrayVariable* arrayVariable, Expression* expression);
       ArrayVariable* arrayVariable;
-      std::list<Expression*>* expressionList;
+      Expression* expression;
       void execute();
 };
 
@@ -126,6 +125,7 @@ class VariableNT : public Node {
 };
 
 enum class RelationalOperator{
+   UNKNOWN,
    EQ,
    NEQ,
    LT,
@@ -137,11 +137,13 @@ enum class RelationalOperator{
 };
 
 enum class AdditionOperator{
+   UNKNOWN,
    ADD,
    SUB
 };
 
 enum class MultiplicationOperator{
+   UNKNOWN,
    MUL,
    DIV
 };
@@ -171,18 +173,18 @@ class Factor : public AbstractFactor {
 
 class Term : public Node {
    public:
-      Term(std::list<Factor*>* factors, std::list<MultiplicationOperator*>* operators);
-      std::list<Factor*>* factors;
-      std::list<MultiplicationOperator*>* operators;
+      Term(std::list<AbstractFactor*>* factors, std::list<MultiplicationOperator>* operators);
+      std::list<AbstractFactor*>* factors;
+      std::list<MultiplicationOperator>* operators;
       void execute();
 };
 
 class SimpleExpression : public Node {
    public:
-      SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator*>* additionOperators);
+      SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator>* additionOperators);
       Sign sign;
       std::list<Term*>* terms;
-      std::list<AdditionOperator*>* additionOperators;
+      std::list<AdditionOperator>* additionOperators;
       void execute();
 };
 
@@ -210,6 +212,7 @@ class WhileStatement : public Node {
 
 class IfStatement : public Node {
    public:
+      IfStatement(Expression* expression, Statement* thenStatement);
       IfStatement(Expression* expression, Statement* thenStatement, Statement* elseStatement);
       Expression* expression;
       Statement* statement;
@@ -230,8 +233,8 @@ class StructuredStatement : public Node {
 
 class WriteStatement : public Node {
    public:
-      WriteStatement(std::list<VariableNT> variableList);
-      std::list<VariableNT> variableList;
+      WriteStatement(std::list<VariableNT*>* variableList);
+      std::list<VariableNT*>* variableList;
       void execute();
 };
 

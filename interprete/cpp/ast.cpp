@@ -58,9 +58,9 @@ ArrayVariable::ArrayVariable(EntireVariable* entireVariable) : Node() {
    this->entireVariable = entireVariable;
 }
 
-IndexedVariable::IndexedVariable(ArrayVariable* arrayVariable, std::list<Expression*>* expressionList) : Node() {
+IndexedVariable::IndexedVariable(ArrayVariable* arrayVariable, Expression* expression) : Node() {
    this->arrayVariable = arrayVariable;
-   this->expressionList = expressionList;
+   this->expression = expression;
 }
 
 VariableNT::VariableNT(EntireVariable* entireVariable) : Node() {
@@ -83,12 +83,12 @@ Factor::Factor(Constant* constant) : AbstractFactor() {
    this->constant = constant;
 }
 
-Term::Term(std::list<Factor*>* factors, std::list<MultiplicationOperator*>* operators) : Node() {
+Term::Term(std::list<AbstractFactor*>* factors, std::list<MultiplicationOperator>* operators) : Node() {
    this->factors = factors;
    this->operators = operators;
 }
 
-SimpleExpression::SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator*>* additionOperators) : Node() {
+SimpleExpression::SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator>* additionOperators) : Node() {
    this->sign = sign;
    this->terms = terms;
    this->additionOperators = additionOperators;
@@ -127,7 +127,7 @@ void StructuredStatement::execute() {
    // FALTA
 }
 
-WriteStatement::WriteStatement(std::list<VariableNT> variableList) : Node() {
+WriteStatement::WriteStatement(std::list<VariableNT*>* variableList) : Node() {
    this->variableList = variableList;
 }
 
@@ -262,6 +262,10 @@ void Program::execute () {
 
 #if false
 //macros
-//^yiwPa::f;s {
-//kf(yi)jVp:s/, /\n/€kb€kbr/g€kbeVi}^:normal daWVi}^:normal yaWA = pA;Vi{^I	this->
+//^yiwPa::f;s {
+
+//kf(yi)jVp:s/, /\n/ï¿½kbï¿½kbr/gï¿½kbe
+Vi}^:normal daW
+Vi}^:normal yaWA = pA;
+Vi{^I	this->
 #endif
