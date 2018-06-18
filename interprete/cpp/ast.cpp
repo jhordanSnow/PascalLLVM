@@ -105,11 +105,19 @@ NotFactor::NotFactor(AbstractFactor* factor) : AbstractFactor() {
 Factor::Factor(VariableNT* variable) : AbstractFactor() {
    this->variable = variable;
    this->constant = 0;
+   this->expression = 0;
 }
 
 Factor::Factor(Constant* constant) : AbstractFactor() {
    this->constant = constant;
    this->variable = 0;
+   this->expression = 0;
+}
+
+Factor::Factor(Expression* expression) : AbstractFactor() {
+   this->constant = 0;
+   this->variable = 0;
+   this->expression = expression;
 }
 
 void Factor::execute(){
@@ -118,6 +126,9 @@ void Factor::execute(){
   }else if (this->variable != 0){
     this->variable->execute();
     this->value = this->variable->value;
+  } else if (this->expression != 0) {
+   this->expression->execute();
+   this->value = this->expression->value;
   }
 }
 
