@@ -100,15 +100,15 @@ string ArrayVariableEnv::getString(int index) {
 }
 
 bool ArrayVariableEnv::getBool(int index) {
-   return boolArray[this->begining + index];
+   return boolArray[index - this->begining];
 }
 
 void ArrayVariableEnv::setInt(int index, int value) {
-   this->intArray[this->begining + index] = value;
+   this->intArray[index - this->begining] = value;
 }
 
 void ArrayVariableEnv::setString(int index, string value) {
-   this->stringArray[this->begining + index] = value;
+   this->stringArray[index - this->begining] = value;
 }
 
 void ArrayVariableEnv::setBool(int index, bool value) {

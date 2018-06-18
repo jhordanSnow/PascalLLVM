@@ -4,25 +4,30 @@
 #include<headders/env.h>
 #include<string>
 #include<list>
+#include<iostream>
 
 // Forward Declarations
 class Block;
 class StructuredStatement;
 class CompoundStatement;
 
+using namespace std;
+
 class Node {
    public:
       Node();
       void execute();
+      virtual void print() = 0;
 };
 
 class Expression;
 /* Lexical Grammar */
 class Identifier : public Node {
    public:
-      Identifier(std::string identifier);
-      std::string identifier;
+      Identifier(string identifier);
+      string identifier;
       void execute();
+      void print();
 };
 
 class ConstantIdentifier : public Node {
@@ -30,17 +35,19 @@ class ConstantIdentifier : public Node {
       ConstantIdentifier(Identifier* identifier);
       Identifier* identifier;
       void execute();
+      void print();
 };
 
 class Constant : public Node {
    public:
       Constant(int intConst);
-      Constant(std::string stringConst);
+      Constant(string stringConst);
       Constant(ConstantIdentifier* constIdentifier);
       int intConst;
-      std::string stringConst;
+      string stringConst;
       ConstantIdentifier* constIdentifier;
       void execute();
+      void print();
 };
 /* Lexical Grammar */
 
@@ -50,6 +57,7 @@ class TypeIdentifier : public Node {
       TypeIdentifier(Identifier* identifier);
       Identifier* identifier;
       void execute();
+      void print();
 };
 
 enum class SimpleType{
@@ -65,6 +73,7 @@ class IndexRange : public Node {
       int begining;
       int end;
       void execute();
+      void print();
 };
 
 class ArrayType : public Node {
@@ -74,6 +83,7 @@ class ArrayType : public Node {
       IndexRange* indexRange;
       SimpleType simpleType;
       void execute();
+      void print();
 };
 
 class DataType : public Node {
@@ -83,6 +93,7 @@ class DataType : public Node {
       SimpleType simpleType;
       ArrayType* arrayType;
       void execute();
+      void print();
 };
 /* Types */
 
@@ -93,6 +104,7 @@ class VariableIdentifier : public Node {
       VariableIdentifier(Identifier* variableIdentifier);
       Identifier* variableIdentifier;
       void execute();
+      void print();
 };
 
 class EntireVariable : public Node {
@@ -100,6 +112,7 @@ class EntireVariable : public Node {
       EntireVariable(VariableIdentifier* variableIdentifier);
       VariableIdentifier* variableIdentifier;
       void execute();
+      void print();
 };
 
 class ArrayVariable : public Node {
@@ -107,6 +120,7 @@ class ArrayVariable : public Node {
       ArrayVariable(EntireVariable* entireVariable);
       EntireVariable* entireVariable;
       void execute();
+      void print();
 };
 
 class IndexedVariable : public Node {
@@ -115,6 +129,7 @@ class IndexedVariable : public Node {
       ArrayVariable* arrayVariable;
       Expression* expression;
       void execute();
+      void print();
 };
 
 class VariableNT : public Node {
@@ -125,6 +140,7 @@ class VariableNT : public Node {
       IndexedVariable* indexedVariable;
       int value;
       void execute();
+      void print();
 };
 
 enum class RelationalOperator{
@@ -157,9 +173,10 @@ enum class Sign {
 };
 
 class AbstractFactor : public Node {
-  public:
-    void execute();
-    int value;
+   public:
+      void execute();
+      int value;
+      virtual void print() = 0;
 };
 
 class NotFactor : public AbstractFactor {
@@ -167,6 +184,7 @@ class NotFactor : public AbstractFactor {
       NotFactor(AbstractFactor* factor);
       AbstractFactor* factor;
       void execute();
+      void print();
 };
 
 class Factor : public AbstractFactor {
@@ -176,25 +194,28 @@ class Factor : public AbstractFactor {
       VariableNT* variable;
       Constant* constant;
       void execute();
+      void print();
 };
 
 class Term : public Node {
    public:
-      Term(std::list<AbstractFactor*>* factors, std::list<MultiplicationOperator>* operators);
-      std::list<AbstractFactor*>* factors;
-      std::list<MultiplicationOperator>* operators;
+      Term(list<AbstractFactor*>* factors, list<MultiplicationOperator>* operators);
+      list<AbstractFactor*>* factors;
+      list<MultiplicationOperator>* operators;
       int value;
       void execute();
+      void print();
 };
 
 class SimpleExpression : public Node {
    public:
-      SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator>* additionOperators);
+      SimpleExpression(Sign sign, list<Term*>* terms, list<AdditionOperator>* additionOperators);
       Sign sign;
-      std::list<Term*>* terms;
-      std::list<AdditionOperator>* additionOperators;
+      list<Term*>* terms;
+      list<AdditionOperator>* additionOperators;
       int value;
       void execute();
+      void print();
 };
 
 class Expression : public Node {
@@ -206,6 +227,7 @@ class Expression : public Node {
       SimpleExpression* simpleExpression2;
       int value;
       void execute();
+      void print();
 };
 /* Expressions */
 
@@ -218,6 +240,7 @@ class WhileStatement : public Node {
       Expression* expression;
       Statement* statement;
       void execute();
+      void print();
 };
 
 class IfStatement : public Node {
@@ -228,6 +251,7 @@ class IfStatement : public Node {
       Statement* statement;
       Statement* elseStatement;
       void execute();
+      void print();
 };
 
 class StructuredStatement : public Node {
@@ -239,20 +263,23 @@ class StructuredStatement : public Node {
       IfStatement* ifStatement;
       WhileStatement* whileStatement;
       void execute();
+      void print();
 };
 
 class WriteStatement : public Node {
    public:
-      WriteStatement(std::list<VariableNT*>* variableList);
-      std::list<VariableNT*>* variableList;
+      WriteStatement(list<VariableNT*>* variableList);
+      list<VariableNT*>* variableList;
       void execute();
+      void print();
 };
 
 class ReadStatement : public Node {
    public:
-      ReadStatement(std::list<VariableNT*>* variableList);
-      std::list<VariableNT*>* variableList;
+      ReadStatement(list<VariableNT*>* variableList);
+      list<VariableNT*>* variableList;
       void execute();
+      void print();
 };
 
 class AssignmentStatement : public Node {
@@ -261,6 +288,7 @@ class AssignmentStatement : public Node {
       VariableNT* variable;
       Expression* expression;
       void execute();
+      void print();
 };
 
 class SimpleStatement : public Node {
@@ -272,6 +300,7 @@ class SimpleStatement : public Node {
       ReadStatement* readStatement;
       WriteStatement* writeStatement;
       void execute();
+      void print();
 };
 
 class Statement : public Node {
@@ -281,13 +310,15 @@ class Statement : public Node {
       SimpleStatement* simpleStatement;
       StructuredStatement* structuredStatement;
       void execute();
+      void print();
 };
-
+;
 class CompoundStatement : public Node {
    public:
-      CompoundStatement(std::list<Statement*>* statementList);
-      std::list<Statement*>* statementList;
+      CompoundStatement(list<Statement*>* statementList);
+      list<Statement*>* statementList;
       void execute();
+      void print();
 };
 
 class StatementPart : public Node {
@@ -295,24 +326,27 @@ class StatementPart : public Node {
       StatementPart(CompoundStatement* compoundStatement);
       CompoundStatement* compoundStatement;
       void execute();
+      void print();
 };
 
 /* Statements */
 
 class VariableDeclaration : public Node {
    public:
-      VariableDeclaration(std::list<Identifier*>* identifierList, DataType* dataType);
-      std::list<Identifier*>* identifierList;
+      VariableDeclaration(list<Identifier*>* identifierList, DataType* dataType);
+      list<Identifier*>* identifierList;
       DataType* dataType;
       void execute();
+      void print();
 };
 
 class VariableDeclarationPart : public Node {
    public:
-      VariableDeclarationPart(std::list<VariableDeclaration*>* variableDeclarations);
+      VariableDeclarationPart(list<VariableDeclaration*>* variableDeclarations);
       VariableDeclarationPart();
-      std::list<VariableDeclaration*>* variableDeclarations;
+      list<VariableDeclaration*>* variableDeclarations;
       void execute();
+      void print();
 };
 
 class Block : public Node {
@@ -321,6 +355,7 @@ class Block : public Node {
       VariableDeclarationPart* variableDeclarationPart;
       StatementPart* statementPart;
       void execute();
+      void print();
 };
 
 class Program : public Node {
@@ -329,5 +364,6 @@ class Program : public Node {
       Identifier* identifier;
       Block* block;
       void execute();
+      void print();
 };
 #endif

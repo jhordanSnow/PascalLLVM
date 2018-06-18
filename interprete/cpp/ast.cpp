@@ -6,7 +6,7 @@
 
 Node::Node() {}
 
-Identifier::Identifier(std::string identifier) : Node() {
+Identifier::Identifier(string identifier) : Node() {
    this->identifier = identifier;
 }
 
@@ -18,7 +18,7 @@ Constant::Constant(int intConst) : Node() {
    this->intConst = intConst;
 }
 
-Constant::Constant(std::string stringConst) : Node() {
+Constant::Constant(string stringConst) : Node() {
    this->stringConst = stringConst;
 }
 
@@ -121,7 +121,7 @@ void Factor::execute(){
   }
 }
 
-Term::Term(std::list<AbstractFactor*>* factors, std::list<MultiplicationOperator>* operators) : Node() {
+Term::Term(list<AbstractFactor*>* factors, list<MultiplicationOperator>* operators) : Node() {
    this->factors = factors;
    this->operators = operators;
 }
@@ -129,7 +129,7 @@ Term::Term(std::list<AbstractFactor*>* factors, std::list<MultiplicationOperator
 void Term::execute(){
   int termValue = 1;
   int itFact = 0;
-  for (std::list<AbstractFactor*>::iterator it = this->factors->begin(); it != this->factors->end(); ++it) {
+  for (list<AbstractFactor*>::iterator it = this->factors->begin(); it != this->factors->end(); ++it) {
     AbstractFactor* factTemp = (*it);
     factTemp->execute();
     if (itFact == 0){
@@ -149,7 +149,7 @@ void Term::execute(){
   this->value = termValue;
 }
 
-SimpleExpression::SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator>* additionOperators) : Node() {
+SimpleExpression::SimpleExpression(Sign sign, list<Term*>* terms, list<AdditionOperator>* additionOperators) : Node() {
    this->sign = sign;
    this->terms = terms;
    this->additionOperators = additionOperators;
@@ -158,7 +158,7 @@ SimpleExpression::SimpleExpression(Sign sign, std::list<Term*>* terms, std::list
 void SimpleExpression::execute(){
   int expValue = 0;
   int itTerm = 0;
-  for (std::list<Term*>::iterator it = this->terms->begin(); it != this->terms->end(); ++it) {
+  for (list<Term*>::iterator it = this->terms->begin(); it != this->terms->end(); ++it) {
     Term* tempTerm = (*it);
     tempTerm->execute();
     if (itTerm == 0){
@@ -251,12 +251,12 @@ void StructuredStatement::execute() {
    // FALTA
 }
 
-WriteStatement::WriteStatement(std::list<VariableNT*>* variableList) : Node() {
+WriteStatement::WriteStatement(list<VariableNT*>* variableList) : Node() {
    this->variableList = variableList;
 }
 
 void WriteStatement::execute() {
-   for (std::list<VariableNT*>::iterator it = this->variableList->begin(); it != this->variableList->end(); ++it) {
+   for (list<VariableNT*>::iterator it = this->variableList->begin(); it != this->variableList->end(); ++it) {
       Enviroment* env = Enviroment::getInstance();
       VariableNT* requestedVar = (*it);
 
@@ -274,18 +274,26 @@ void WriteStatement::execute() {
             cout << stringVar->toString() << endl;
          }
       } else { // indexed variable
-         //EnvVariable* var = env->getVariable(requestedVar->indexedVariable->arrayVariabl->entireVariable->variableIdentifier->variableIdentifier->identifier);
-         // FALTA EXPRESSION
+         ArrayVariableEnv* var = (ArrayVariableEnv*)env->getVariable(requestedVar->indexedVariable->arrayVariable->entireVariable->variableIdentifier->variableIdentifier->identifier);
+         int varType = var->getType();
+         if (varType == 1) { // int
+            cout << var->getInt(1) << endl;
+         } else if (varType == 2) { // boolean
+            cout << var->getBool(1) << endl;
+         } else if (varType == 3) { // string
+            cout << var->getString(1) << endl;
+         }
+
       }
    }
 }
 
-ReadStatement::ReadStatement(std::list<VariableNT*>* variableList) : Node() {
+ReadStatement::ReadStatement(list<VariableNT*>* variableList) : Node() {
    this->variableList = variableList;
 }
 
 void ReadStatement::execute() {
-   for (std::list<VariableNT*>::iterator it = this->variableList->begin(); it != this->variableList->end(); ++it) {
+   for (list<VariableNT*>::iterator it = this->variableList->begin(); it != this->variableList->end(); ++it) {
       Enviroment* env = Enviroment::getInstance();
       VariableNT* requestedVar = (*it);
 
@@ -419,12 +427,12 @@ void Statement::execute() {
    }
 }
 
-CompoundStatement::CompoundStatement(std::list<Statement*>* statementList) : Node() {
+CompoundStatement::CompoundStatement(list<Statement*>* statementList) : Node() {
    this->statementList = statementList;
 }
 
 void CompoundStatement::execute() {
-   for (std::list<Statement*>::iterator it = this->statementList->begin(); it != this->statementList->end(); ++it) {
+   for (list<Statement*>::iterator it = this->statementList->begin(); it != this->statementList->end(); ++it) {
       Statement* s = (*it);
       s->execute();
    }
@@ -438,7 +446,7 @@ void StatementPart::execute() {
    this->compoundStatement->execute();
 }
 
-VariableDeclaration::VariableDeclaration(std::list<Identifier*>* identifierList, DataType* dataType) : Node() {
+VariableDeclaration::VariableDeclaration(list<Identifier*>* identifierList, DataType* dataType) : Node() {
    this->identifierList = identifierList;
    this->dataType = dataType;
 }
@@ -447,7 +455,7 @@ void VariableDeclaration::execute() {
    Enviroment* env = Enviroment::getInstance();
    DataType* dt = this->dataType;
    if (dt->arrayType == 0) { // si es un tipo simple
-      for (std::list<Identifier*>::iterator it = this->identifierList->begin(); it != this->identifierList->end(); ++it) {
+      for (list<Identifier*>::iterator it = this->identifierList->begin(); it != this->identifierList->end(); ++it) {
          Identifier* id = (*it);
          if (dt->simpleType == SimpleType::INTEGER){
             env->addInt(id->identifier, 0);
@@ -458,7 +466,7 @@ void VariableDeclaration::execute() {
          }
       }
    } else { // si es un tipo array
-      for (std::list<Identifier*>::iterator it = this->identifierList->begin(); it != this->identifierList->end(); ++it) {
+      for (list<Identifier*>::iterator it = this->identifierList->begin(); it != this->identifierList->end(); ++it) {
          Identifier* id = (*it);
          ArrayType* at = dt->arrayType;
          IndexRange* ir = at->indexRange;
@@ -473,7 +481,7 @@ void VariableDeclaration::execute() {
    }
 }
 
-VariableDeclarationPart::VariableDeclarationPart(std::list<VariableDeclaration*>* variableDeclarations) : Node() {
+VariableDeclarationPart::VariableDeclarationPart(list<VariableDeclaration*>* variableDeclarations) : Node() {
    this->variableDeclarations = variableDeclarations;
 }
 
@@ -482,7 +490,7 @@ VariableDeclarationPart::VariableDeclarationPart() : Node() {
 }
 
 void VariableDeclarationPart::execute() {
-   for (std::list<VariableDeclaration*>::iterator it = this->variableDeclarations->begin(); it != this->variableDeclarations->end(); ++it){
+   for (list<VariableDeclaration*>::iterator it = this->variableDeclarations->begin(); it != this->variableDeclarations->end(); ++it){
       VariableDeclaration* varDeclaration = (*it);
       varDeclaration->execute();
    }
@@ -507,12 +515,233 @@ void Program::execute () {
    block->execute();
 }
 
-#if false
-//macros
-//^yiwPa::f;s {
-
-//kf(yi)jVp:s/, /\n/�kb�kbr/g�kbe
-Vi}^:normal daW
-Vi}^:normal yaWA = pA;
-Vi{^I	this->
-#endif
+// PRINTS
+
+void Program::print() {
+   cout << "program {\n";
+   if(identifier != 0) identifier->print();
+   if (block != 0) block->print();
+   cout << "}" << endl;
+}
+
+
+void Identifier::print() {
+   cout << "identifier: "<< this->identifier << endl;
+};
+
+void ConstantIdentifier::print() {
+   cout << "ConstantIdentifier {" << endl;
+   if(identifier != 0) identifier->print();
+   cout << "}" << endl;
+};
+
+void Constant::print() {
+   cout << "constant {" << endl;
+   cout << this->stringConst << endl;
+   cout << this->constIdentifier << endl;
+   if(constIdentifier != 0) constIdentifier->print();
+   cout << "}" << endl;
+};
+
+void TypeIdentifier::print() {
+   cout << "TypeIdentifier {" << endl;
+   if(identifier != 0) identifier->print();
+   cout << "}" << endl;
+};
+
+void IndexRange::print() {
+   cout << "IndexRange {" << endl;
+   cout << this->begining << endl;
+   cout << this->end << endl;
+   cout << "}" << endl;
+};
+
+void ArrayType::print() {
+   cout << "ArrayType {" << endl;
+   if(indexRange != 0) indexRange->print();
+   cout << "}" << endl;
+};
+
+void DataType::print() {
+   cout << "DataType {" << endl;
+   if(arrayType != 0) arrayType->print();
+   cout << "}" << endl;
+};
+
+void VariableIdentifier::print() {
+   cout << "Variable Identifier {" << endl;
+   if(variableIdentifier != 0) variableIdentifier->print();
+   cout << "}" << endl;
+};
+
+void EntireVariable::print() {
+   cout << "Entire Variable {" << endl;
+   if(variableIdentifier != 0) variableIdentifier->print();
+   cout << "}" << endl;
+};
+
+void ArrayVariable::print() {
+   cout << "ArrayVariableEnv {" << endl;
+   if(entireVariable != 0) entireVariable->print();
+   cout << "}" << endl;
+};
+
+void IndexedVariable::print() {
+   cout << "IndexedVariable {" << endl;
+   if(arrayVariable != 0) arrayVariable->print();
+   if(expression != 0) expression->print();
+   cout << "}" << endl;
+};
+
+void VariableNT::print() {
+   cout << "variable {" << endl;
+   if(entireVariable != 0) entireVariable->print();
+   if(indexedVariable != 0) indexedVariable->print();
+   cout << "}" << endl;
+};
+
+void NotFactor::print() {
+   cout << "Not Factor {" << endl;
+   if(factor != 0) factor->print();
+   cout << "}" << endl;
+};
+
+void Factor::print() {
+   cout << "factor {" << endl;
+   if(variable != 0) variable->print();
+   if(constant != 0) constant->print();
+   cout << "}" << endl;
+};
+
+void Term::print() {
+   cout << "Term {" << endl;
+   for (list<AbstractFactor*>::iterator it = factors->begin(); it != factors->end(); ++it) {
+      AbstractFactor* var = (*it);
+      var->print();
+   }
+   cout << "}" << endl;
+};
+
+void SimpleExpression::print() {
+   cout << "SimpleExpression {" << endl;
+   for (list<Term*>::iterator it = terms->begin(); it != terms->end(); ++it) {
+      Term* var = (*it);
+      var->print();
+   }
+   cout << "}" << endl;
+};
+
+void Expression::print() {
+   cout << "Expression {" << endl;
+   if(simpleExpression1 != 0) simpleExpression1->print();
+   if(simpleExpression2 != 0) simpleExpression2->print();
+   cout << "}" << endl;
+};
+
+void WhileStatement::print() {
+   cout << "while Statement {" << endl;
+   if(expression != 0) expression->print();
+   if(statement != 0) statement->print();
+   cout << "}" << endl;
+};
+
+void IfStatement::print() {
+   cout << "If statement {" << endl;
+   if(expression != 0) expression->print();
+   if(statement != 0) statement->print();
+   if(elseStatement != 0) elseStatement->print();
+   cout << "}" << endl;
+};
+
+void StructuredStatement::print() {
+   cout << "structuredStatement {" << endl;
+   if(compoundStatement != 0) compoundStatement->print();
+   if(ifStatement != 0) ifStatement->print();
+   if(whileStatement != 0) whileStatement->print();
+   cout << "}" << endl;
+};
+
+void WriteStatement::print() {
+   cout << "Write Statement" << endl;
+   for (list<VariableNT*>::iterator it = variableList->begin(); it != variableList->end(); ++it) {
+      VariableNT* var = (*it);
+      var->print();
+   }
+   cout << "}" << endl;
+};
+
+void ReadStatement::print() {
+   cout << "read statement {" << endl;
+   for (list<VariableNT*>::iterator it = variableList->begin(); it != variableList->end(); ++it) {
+      VariableNT* var = (*it);
+      var->print();
+   }
+   cout << "}" << endl;
+};
+
+void AssignmentStatement::print() {
+   cout << "Assignment Statement {" << endl;
+   if(variable != 0) variable->print();
+   if(expression != 0) expression->print();
+   cout << "}" << endl;
+};
+
+void SimpleStatement::print() {
+   cout << "simpleStatement {" << endl;
+   if(assignmentStatement != 0) assignmentStatement->print();
+   if(readStatement != 0) readStatement->print();
+   if(writeStatement != 0) writeStatement->print();
+   cout << "}" << endl;
+};
+
+void Statement::print() {
+   cout << "Statement {" << endl;
+   if (simpleStatement != 0) simpleStatement->print();
+   if (structuredStatement != 0) structuredStatement->print();
+};
+
+void CompoundStatement::print() {
+   cout << "compoundStatement {" << endl;
+   if (statementList != 0) {
+      for (list<Statement*>::iterator it = statementList->begin(); it != statementList->end(); ++it) {
+         Statement* st = (*it);
+         st->print();
+      }
+   }
+   cout << "}" << endl;
+};
+
+void StatementPart::print() {
+   cout << "statementPart {" << endl;
+   if (compoundStatement != 0) compoundStatement->print();
+   cout << "}" << endl;
+};
+
+void VariableDeclaration::print() {
+   cout << "variable declaration {" << endl;
+   if (identifierList != 0) {
+      for (list<Identifier*>::iterator it = identifierList->begin(); it != identifierList->end(); ++it) {
+         Identifier* id = (*it);
+         id->print();
+      }
+   }
+   cout << "}" << endl;
+};
+
+void VariableDeclarationPart::print() {
+   cout << "var declaration part {\n";
+   if (variableDeclarations != 0) {
+      for (list<VariableDeclaration*>::iterator it = variableDeclarations->begin(); it != variableDeclarations->end(); ++it) {
+         VariableDeclaration* var = (*it);
+         var->print();
+      }
+   }
+   cout << "}" << endl;
+}
+
+void Block::print() {
+   cout << "block {\n";
+   if (variableDeclarationPart != 0) variableDeclarationPart->print();
+   if (statementPart != 0) statementPart->print();
+   cout << "}" << endl;
+}

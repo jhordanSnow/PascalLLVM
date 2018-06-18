@@ -40,10 +40,11 @@ Program* ArbolEjemplo () {
    identifierList->push_front(new Identifier("d"));
 
    list<VariableDeclaration*>* variableDeclarationsList = new list<VariableDeclaration*>();
-   //variableDeclarationsList->push_front(new VariableDeclaration(identifierList, new DataType(new ArrayType(new IndexRange(1, 100), SimpleType::INTEGER)))); //Array type
-   variableDeclarationsList->push_front(new VariableDeclaration(identifierList, new DataType(SimpleType::INTEGER))); //SimpleType
+   variableDeclarationsList->push_front(new VariableDeclaration(identifierList, new DataType(new ArrayType(new IndexRange(1, 100), SimpleType::INTEGER)))); //Array type
+   //variableDeclarationsList->push_front(new VariableDeclaration(identifierList, new DataType(SimpleType::INTEGER))); //SimpleType
 
    list<VariableNT*>* variableListRead = new list<VariableNT*>();
+
    variableListRead->push_back(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("a")))));
    variableListRead->push_back(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("b")))));
    variableListRead->push_back(new VariableNT(new EntireVariable(new VariableIdentifier(new Identifier("c")))));
@@ -73,6 +74,8 @@ Program* ArbolEjemplo () {
 
    VariableDeclarationPart* vdp = new VariableDeclarationPart(variableDeclarationsList);
    vdp->execute();
+
+   Enviroment::getInstance()->print();
 
    StatementPart* sp = new StatementPart(new CompoundStatement(statementList));
    sp->execute();
@@ -109,10 +112,8 @@ int main(int argc, char** argv) {
 
    std::cout << "Tokens - " << tokens->size() << '\n';
 
-   Program* p = ArbolEjemplo();
-   cout << "identificador" << p->identifier->identifier << endl;
-
-   AnalizadorSintactico::analizar(tokens);
+   Program* p = AnalizadorSintactico::analizar(tokens);
+   p->print();
 
    return 0;
 }
