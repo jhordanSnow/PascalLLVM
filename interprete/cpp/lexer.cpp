@@ -18,14 +18,14 @@ namespace MiniPascal{
     for (list<string>::iterator line = code->begin(); line != code->end(); ++line){
       this->isComment = false;
       this->buffer = "";
-      getTokensInLine(*line + " ");
+      getTokensInLine(*line + "  ");
       this->rowNumber++;
     }
     return this->tokens;
   }
 
   void Lexer::getTokensInLine(string line){
-    string symbols = ",;():+-*[]=<>/\"\'";
+    string symbols = ".,;():+-*[]=<>/\"\'";
     string endWord = "\n ,"+symbols;
 
     for(this->charIterator = 0; this->charIterator < line.length() - 1; ++this->charIterator){
