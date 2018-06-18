@@ -18,7 +18,6 @@ Program* AnalizadorSintactico::program(list<Token*>* tokenList) {
    tokenHead = tokenList->front();
    Identifier* i;
    if (tokenHead->getTokenType() == TokenType::IDENTIFIER) {
-      tokenList->pop_front();
       i = AnalizadorSintactico::identifier(tokenList);
    }
 
