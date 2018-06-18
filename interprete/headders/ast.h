@@ -110,9 +110,9 @@ class ArrayVariable : public Node {
 
 class IndexedVariable : public Node {
    public:
-      IndexedVariable(ArrayVariable* arrayVariable, std::list<Expression*>* expressionList);
+      IndexedVariable(ArrayVariable* arrayVariable, Expression* expression);
       ArrayVariable* arrayVariable;
-      std::list<Expression*>* expressionList;
+      Expression* expression;
       void execute();
 };
 
@@ -230,8 +230,8 @@ class StructuredStatement : public Node {
 
 class WriteStatement : public Node {
    public:
-      WriteStatement(std::list<VariableNT> variableList);
-      std::list<VariableNT> variableList;
+      WriteStatement(std::list<VariableNT*>* variableList);
+      std::list<VariableNT*>* variableList;
       void execute();
 };
 
