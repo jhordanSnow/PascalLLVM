@@ -413,7 +413,7 @@ AbstractFactor* AnalizadorSintactico::factor(list<Token*>* tokenList){
    tokenList->pop_front();
    std::locale loc;
    //if variable{} if constant identifier
-
+  
    if (tokenHead->getTokenName() == "\'" || tokenHead->getTokenName() == "\"") { //constant string
       tokenHead = tokenList->front();
       tokenList->pop_front();
@@ -423,6 +423,9 @@ AbstractFactor* AnalizadorSintactico::factor(list<Token*>* tokenList){
       tokenHead = tokenList->front();
       tokenList->pop_front();
       return new Factor(new Constant(atoi(tokenHead->getTokenName().data())));
+   }else if (tokenHead->getTokenType() == TokenType::IDENTIFIER) {
+      tokenList->pop_front();
+      //return new Factor(AnalizadorSintactico::identifier(tokenList));
    }else if (tokenHead->getTokenName() == "not") { //not
       tokenHead = tokenList->front();
       tokenList->pop_front();
