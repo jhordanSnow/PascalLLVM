@@ -139,6 +139,8 @@ class VariableNT : public Node {
       EntireVariable* entireVariable;
       IndexedVariable* indexedVariable;
       int value;
+      string stringValue;
+      int type;
       void execute();
       void print();
 };
@@ -176,6 +178,8 @@ class AbstractFactor : public Node {
    public:
       void execute();
       int value;
+      string stringValue;
+      int type;
       virtual void print() = 0;
 };
 
@@ -205,6 +209,8 @@ class Term : public Node {
       list<AbstractFactor*>* factors;
       list<MultiplicationOperator>* operators;
       int value;
+      string stringValue;
+      int type;
       void execute();
       void print();
 };
@@ -216,6 +222,8 @@ class SimpleExpression : public Node {
       list<Term*>* terms;
       list<AdditionOperator>* additionOperators;
       int value;
+      string stringValue;
+      int type;
       void execute();
       void print();
 };
@@ -228,6 +236,8 @@ class Expression : public Node {
       RelationalOperator relationalOperator;
       SimpleExpression* simpleExpression2;
       int value;
+      string stringValue;
+      int type;
       void execute();
       void print();
 };

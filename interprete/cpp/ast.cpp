@@ -16,6 +16,7 @@ ConstantIdentifier::ConstantIdentifier(Identifier* identifier) : Node() {
 
 Constant::Constant(int intConst) : Node() {
    this->intConst = intConst;
+   this->stringConst = "";
 }
 
 Constant::Constant(string stringConst) : Node() {
@@ -80,13 +81,16 @@ void VariableNT::execute(){
   Enviroment* env = Enviroment::getInstance();
   if (this->entireVariable != 0){
     EnvVariable* var = env->getVariable(this->entireVariable->variableIdentifier->variableIdentifier->identifier);
-    int varType = var->getType();
-    if (varType == 1) {
+    this->type = var->getType();
+    if (this->type == 1) {
        IntVariable* intVar = (IntVariable*)var;
        this->value = intVar->getValue();
-    }else if (varType == 2) {
+    }else if (this->type == 2) {
        BoolVariable* boolVar = (BoolVariable*)var;
        this->value = (boolVar->getValue()) ? 1 : 2;
+    }else if (this->type == 3){
+      StringVariable* stringVar = (StringVariable*)var;
+      this->stringValue = stringVar->getValue();
     }
   }else if (this->indexedVariable != 0){
     this->indexedVariable->expression->execute();
@@ -123,12 +127,18 @@ Factor::Factor(Expression* expression) : AbstractFactor() {
 void Factor::execute(){
   if (this->constant != 0) {
     this->value = this->constant->intConst;
+    this->stringValue = this->constant->stringConst;
+    this->type = (this->constant->stringConst != "") ? 3 : 1;
   }else if (this->variable != 0){
     this->variable->execute();
     this->value = this->variable->value;
+    this->stringValue = this->expression->stringValue;
+    this->type = this->variable->value;
   } else if (this->expression != 0) {
    this->expression->execute();
    this->value = this->expression->value;
+   this->stringValue = this->expression->stringValue;
+   this->type = this->expression->type;
   }
 }
 
@@ -145,7 +155,9 @@ void Term::execute(){
     factTemp->execute();
     if (itFact == 0){
       termValue = factTemp->value;
+      this->stringValue = factTemp->stringValue;
     }
+    // Lanzar error tal vez (?)
     if (this->operators->size() > 0 && itFact > 0){
       MultiplicationOperator mulOperator = this->operators->front();
       this->operators->pop_front();
@@ -158,6 +170,7 @@ void Term::execute(){
     itFact++;
   }
   this->value = termValue;
+  this->type = (this->stringValue != "") ? 3 : 1;
 }
 
 SimpleExpression::SimpleExpression(Sign sign, list<Term*>* terms, list<AdditionOperator>* additionOperators) : Node() {
@@ -168,18 +181,21 @@ SimpleExpression::SimpleExpression(Sign sign, list<Term*>* terms, list<AdditionO
 
 void SimpleExpression::execute(){
   int expValue = 0;
+  string expValueS = "";
   int itTerm = 0;
   for (list<Term*>::iterator it = this->terms->begin(); it != this->terms->end(); ++it) {
     Term* tempTerm = (*it);
     tempTerm->execute();
     if (itTerm == 0){
       expValue = (sign == Sign::NEGATIVE) ? -1 * tempTerm->value : tempTerm->value;
+      expValueS = tempTerm->stringValue;
     }
     if (this->additionOperators->size() > 0 && itTerm > 0){
       AdditionOperator AddOperator = this->additionOperators->front();
       this->additionOperators->pop_front();
       if (AddOperator == AdditionOperator::ADD){
         expValue += tempTerm->value;
+        expValueS += tempTerm->stringValue;
       }else if (AddOperator == AdditionOperator::SUB){
         expValue -= tempTerm->value;
       }
@@ -187,6 +203,7 @@ void SimpleExpression::execute(){
     itTerm++;
   }
   this->value = expValue;
+  this->type = (this->stringValue != "") ? 3 : 1;
 }
 
 Expression::Expression(SimpleExpression* simpleExpression1) : Node() {
@@ -201,14 +218,16 @@ Expression::Expression(SimpleExpression* simpleExpression1, RelationalOperator r
 }
 
 void Expression::execute(){
-  simpleExpression1->execute();
-  this->value = simpleExpression1->value;
-  if (simpleExpression2 != 0){
-    simpleExpression2->execute();
+  this->simpleExpression1->execute();
+  this->type = this->simpleExpression1->type;
+  this->value = this->simpleExpression1->value;
+  this->stringValue = this->simpleExpression1->stringValue;
+  if (this->simpleExpression2 != 0){
+    this->simpleExpression2->execute();
     if (this->relationalOperator == RelationalOperator::EQ){
-      this->value = simpleExpression1->value == simpleExpression2->value;
+      this->value = (this->type != 3) ? this->simpleExpression1->value == this->simpleExpression2->value : this->simpleExpression1->stringValue == this->simpleExpression2->stringValue;
     }else if (this->relationalOperator == RelationalOperator::NEQ){
-      this->value = simpleExpression1->value != simpleExpression2->value;
+      this->value = (this->type != 3) ? this->simpleExpression1->value != this->simpleExpression2->value : this->simpleExpression1->stringValue != this->simpleExpression2->stringValue;
     }else if (this->relationalOperator == RelationalOperator::LT){
       this->value = simpleExpression1->value < simpleExpression2->value;
     }else if (this->relationalOperator == RelationalOperator::LEQ){
@@ -373,6 +392,7 @@ void ReadStatement::execute() {
          }
       } else { // indexed variable // FALTA Cambiar los 1 por expression
          ArrayVariableEnv* var = (ArrayVariableEnv*)env->getVariable(requestedVar->indexedVariable->arrayVariable->entireVariable->variableIdentifier->variableIdentifier->identifier);
+         requestedVar->indexedVariable->expression->execute();
          int varType = var->getType();
          if (varType == 1) { // int
             int newVar = 0;
@@ -383,7 +403,7 @@ void ReadStatement::execute() {
                cin.clear();
                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
-            var->setInt(1, newVar);
+            var->setInt(requestedVar->indexedVariable->expression->value, newVar);
          } else if (varType == 2) { // boolean
             bool newVar = false;
             cout << "boolean(1/0): ";
@@ -393,7 +413,7 @@ void ReadStatement::execute() {
                cin.clear();
                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
-            var->setBool(1, newVar);
+            var->setBool(requestedVar->indexedVariable->expression->value, newVar);
          } else if (varType == 3) { // string
             string newVar = "";
             cout << "string: ";
@@ -403,7 +423,7 @@ void ReadStatement::execute() {
                cin.clear();
                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
-            var->setString(1, newVar);
+            var->setString(requestedVar->indexedVariable->expression->value, newVar);
          }
       }
    }
@@ -415,7 +435,30 @@ AssignmentStatement::AssignmentStatement(VariableNT* variable, Expression* expre
 }
 
 void AssignmentStatement::execute() {
-   // FALTA EXPRESSION
+  Enviroment* env = Enviroment::getInstance();
+  this->expression->execute();
+  if (this->variable->entireVariable != 0) {
+     EnvVariable* var = env->getVariable(this->variable->entireVariable->variableIdentifier->variableIdentifier->identifier);
+     int varType = var->getType();
+     if (varType == 1) {
+        ((IntVariable*)var)->setValue(this->expression->value);
+     } else if (varType == 2) {
+        ((BoolVariable*)var)->setValue((this->expression->value == 0) ? false : true);
+     } else if (varType == 3) {
+       ((StringVariable*)var)->setValue(this->expression->stringValue);
+     }
+  } else { // indexed variable
+     ArrayVariableEnv* var = (ArrayVariableEnv*)env->getVariable(this->variable->indexedVariable->arrayVariable->entireVariable->variableIdentifier->variableIdentifier->identifier);
+     this->variable->indexedVariable->expression->execute();
+     int varType = var->getType();
+     if (varType == 1) {
+        var->setInt(this->variable->indexedVariable->expression->value, this->expression->value);
+     } else if (varType == 2) {
+        var->setBool(this->variable->indexedVariable->expression->value, (this->expression->value == 0) ? false : true);
+     } else if (varType == 3) {
+        var->setString(this->variable->indexedVariable->expression->value, this->expression->stringValue);
+     }
+  }
 }
 
 SimpleStatement::SimpleStatement(AssignmentStatement* assignmentStatement) : Node() {
