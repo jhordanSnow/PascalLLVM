@@ -1,6 +1,7 @@
 #ifndef AST_H_
 #define AST_H_
 
+#include<headders/env.h>
 #include<string>
 #include<list>
 
@@ -122,6 +123,7 @@ class VariableNT : public Node {
       VariableNT(IndexedVariable* indexedVariable);
       EntireVariable* entireVariable;
       IndexedVariable* indexedVariable;
+      int value;
       void execute();
 };
 
@@ -154,8 +156,12 @@ enum class Sign {
    NEGATIVE
 };
 
-class AbstractFactor : public Node {void execute();
+class AbstractFactor : public Node {
+  public:
+    void execute();
+    int value;
 };
+
 class NotFactor : public AbstractFactor {
    public:
       NotFactor(AbstractFactor* factor);
@@ -177,6 +183,7 @@ class Term : public Node {
       Term(std::list<AbstractFactor*>* factors, std::list<MultiplicationOperator>* operators);
       std::list<AbstractFactor*>* factors;
       std::list<MultiplicationOperator>* operators;
+      int value;
       void execute();
 };
 
@@ -186,6 +193,7 @@ class SimpleExpression : public Node {
       Sign sign;
       std::list<Term*>* terms;
       std::list<AdditionOperator>* additionOperators;
+      int value;
       void execute();
 };
 
@@ -196,6 +204,7 @@ class Expression : public Node {
       SimpleExpression* simpleExpression1;
       RelationalOperator relationalOperator;
       SimpleExpression* simpleExpression2;
+      int value;
       void execute();
 };
 /* Expressions */

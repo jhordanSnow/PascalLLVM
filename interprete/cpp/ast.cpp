@@ -76,6 +76,28 @@ VariableNT::VariableNT(IndexedVariable* indexedVariable) : Node() {
    this->entireVariable = 0;
 }
 
+void VariableNT::execute(){
+  Enviroment* env = Enviroment::getInstance();
+  if (this->entireVariable != 0){
+    EnvVariable* var = env->getVariable(this->entireVariable->variableIdentifier->variableIdentifier->identifier);
+    int varType = var->getType();
+    if (varType == 1) {
+       IntVariable* intVar = (IntVariable*)var;
+       this->value = intVar->getValue();
+    }else if (varType == 2) {
+       BoolVariable* boolVar = (BoolVariable*)var;
+       this->value = (boolVar->getValue()) ? 1 : 2;
+    }
+  }else if (this->indexedVariable != 0){
+    this->indexedVariable->expression->execute();
+    EnvVariable* var = env->getVariable(this->indexedVariable->arrayVariable->entireVariable->variableIdentifier->variableIdentifier->identifier);
+    ArrayVariableEnv* arrayVar = (ArrayVariableEnv*)var;
+    this->value = arrayVar->getInt(this->indexedVariable->expression->value);
+  }
+}
+
+void AbstractFactor::execute(){}
+
 NotFactor::NotFactor(AbstractFactor* factor) : AbstractFactor() {
    this->factor = factor;
 }
@@ -90,15 +112,70 @@ Factor::Factor(Constant* constant) : AbstractFactor() {
    this->variable = 0;
 }
 
+void Factor::execute(){
+  if (this->constant != 0) {
+    this->value = this->constant->intConst;
+  }else if (this->variable != 0){
+    this->variable->execute();
+    this->value = this->variable->value;
+  }
+}
+
 Term::Term(std::list<AbstractFactor*>* factors, std::list<MultiplicationOperator>* operators) : Node() {
    this->factors = factors;
    this->operators = operators;
+}
+
+void Term::execute(){
+  int termValue = 1;
+  int itFact = 0;
+  for (std::list<AbstractFactor*>::iterator it = this->factors->begin(); it != this->factors->end(); ++it) {
+    AbstractFactor* factTemp = (*it);
+    factTemp->execute();
+    if (itFact == 0){
+      termValue = factTemp->value;
+    }
+    if (this->operators->size() > 0 && itFact > 0){
+      MultiplicationOperator mulOperator = this->operators->front();
+      this->operators->pop_front();
+      if (mulOperator == MultiplicationOperator::MUL){
+        termValue *= factTemp->value;
+      }else if (mulOperator == MultiplicationOperator::DIV){
+        termValue /= factTemp->value;
+      }
+    }
+    itFact++;
+  }
+  this->value = termValue;
 }
 
 SimpleExpression::SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator>* additionOperators) : Node() {
    this->sign = sign;
    this->terms = terms;
    this->additionOperators = additionOperators;
+}
+
+void SimpleExpression::execute(){
+  int expValue = 0;
+  int itTerm = 0;
+  for (std::list<Term*>::iterator it = this->terms->begin(); it != this->terms->end(); ++it) {
+    Term* tempTerm = (*it);
+    tempTerm->execute();
+    if (itTerm == 0){
+      expValue = (sign == Sign::NEGATIVE) ? -1 * tempTerm->value : tempTerm->value;
+    }
+    if (this->additionOperators->size() > 0 && itTerm > 0){
+      AdditionOperator AddOperator = this->additionOperators->front();
+      this->additionOperators->pop_front();
+      if (AddOperator == AdditionOperator::ADD){
+        expValue += tempTerm->value;
+      }else if (AddOperator == AdditionOperator::SUB){
+        expValue -= tempTerm->value;
+      }
+    }
+    itTerm++;
+  }
+  this->value = expValue;
 }
 
 Expression::Expression(SimpleExpression* simpleExpression1) : Node() {
@@ -110,6 +187,31 @@ Expression::Expression(SimpleExpression* simpleExpression1, RelationalOperator r
    this->simpleExpression1 = simpleExpression1;
    this->relationalOperator = relationalOperator;
    this->simpleExpression2 = simpleExpression2;
+}
+
+void Expression::execute(){
+  simpleExpression1->execute();
+  this->value = simpleExpression1->value;
+  if (simpleExpression2 != 0){
+    simpleExpression2->execute();
+    if (this->relationalOperator == RelationalOperator::EQ){
+      this->value = simpleExpression1->value == simpleExpression2->value;
+    }else if (this->relationalOperator == RelationalOperator::NEQ){
+      this->value = simpleExpression1->value != simpleExpression2->value;
+    }else if (this->relationalOperator == RelationalOperator::LT){
+      this->value = simpleExpression1->value < simpleExpression2->value;
+    }else if (this->relationalOperator == RelationalOperator::LEQ){
+      this->value = simpleExpression1->value <= simpleExpression2->value;
+    }else if (this->relationalOperator == RelationalOperator::GT){
+      this->value = simpleExpression1->value > simpleExpression2->value;
+    }else if (this->relationalOperator == RelationalOperator::GEQ){
+      this->value = simpleExpression1->value >= simpleExpression2->value;
+    }else if (this->relationalOperator == RelationalOperator::OR){
+      this->value = simpleExpression1->value || simpleExpression2->value;
+    }else if (this->relationalOperator == RelationalOperator::AND){
+      this->value = simpleExpression1->value && simpleExpression2->value;
+    }
+  }
 }
 
 WhileStatement::WhileStatement(Expression* expression, Statement* statement) : Node() {
@@ -167,7 +269,7 @@ void WriteStatement::execute() {
          } else if (varType == 2) { // string
             BoolVariable* boolVar = (BoolVariable*)var;
             cout << boolVar->toString() << endl;
-         } else if (varType == 3) { // boolean 
+         } else if (varType == 3) { // boolean
             StringVariable* stringVar = (StringVariable*)var;
             cout << stringVar->toString() << endl;
          }
@@ -212,7 +314,7 @@ void ReadStatement::execute() {
                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
             boolVar->setValue(newVar);
-         } else if (varType == 3) { // string 
+         } else if (varType == 3) { // string
             StringVariable* stringVar = (StringVariable*)var;
             string newVar = "";
             cout << "string: ";
@@ -247,7 +349,7 @@ void ReadStatement::execute() {
                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
             var->setBool(1, newVar);
-         } else if (varType == 3) { // string 
+         } else if (varType == 3) { // string
             string newVar = "";
             cout << "string: ";
             while (!(cin >> newVar)) {
@@ -353,7 +455,7 @@ void VariableDeclaration::execute() {
             env->addString(id->identifier, "");
          } else if (dt->simpleType == SimpleType::BOOLEAN) {
             env->addBool(id->identifier, false);
-         } 
+         }
       }
    } else { // si es un tipo array
       for (std::list<Identifier*>::iterator it = this->identifierList->begin(); it != this->identifierList->end(); ++it) {
