@@ -1,5 +1,6 @@
 #include <headders/ast.h>
 #include <headders/env.h>
+#include<headders/helpers.h>
 #include<string>
 #include<list>
 #include<limits>
@@ -563,9 +564,12 @@ void ArrayType::print() {
 };
 
 void DataType::print() {
-   cout << "DataType {" << endl;
+   cout << "DataType { ";
    if(arrayType != 0) arrayType->print();
-   cout << "}" << endl;
+   else{ 
+     cout << Helpers::SimpleTypeToString(simpleType);
+   }
+   cout << " }" << endl;
 };
 
 void VariableIdentifier::print() {
@@ -698,6 +702,7 @@ void Statement::print() {
    cout << "Statement {" << endl;
    if (simpleStatement != 0) simpleStatement->print();
    if (structuredStatement != 0) structuredStatement->print();
+   cout << "}" << endl;
 };
 
 void CompoundStatement::print() {
@@ -725,6 +730,8 @@ void VariableDeclaration::print() {
          id->print();
       }
    }
+   cout<< ":";
+   dataType->print();
    cout << "}" << endl;
 };
 

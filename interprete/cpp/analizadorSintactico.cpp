@@ -42,8 +42,73 @@ Block* AnalizadorSintactico::block(list<Token*>* tokenList) {
    return new Block(variableDeclarationPart(tokenList),statementPart(tokenList));
 }
 
+
+VariableDeclarationPart* AnalizadorSintactico::variableDeclarationPart(list<Token*>* tokenList) {
+   Token* tokenHead = tokenList->front();
+   if (tokenHead->getTokenName() == "var") {
+      tokenList->pop_front();
+      list<VariableDeclaration*>* variableDeclarations = new list<VariableDeclaration*>();
+      tokenHead = tokenList->front();
+      variableDeclarations->push_back(variableDeclaration(tokenList));
+      VariableDeclarationPart* variableDeclarationPart = new VariableDeclarationPart(variableDeclarations);
+      tokenHead = tokenList->front();
+      if (tokenHead->getTokenName() == ";") {
+          tokenList->pop_front();
+      }
+      optionalVariableDeclarationsPart(tokenList, variableDeclarationPart);      
+      return variableDeclarationPart;
+   }
+   return NULL;
+}
+
+void AnalizadorSintactico::optionalVariableDeclarationsPart(list<Token*>* tokenList, VariableDeclarationPart* variableDeclarationPart) {
+  Token* tokenHead = tokenList->front();
+	if (tokenHead->getTokenType() == TokenType::IDENTIFIER) {
+     variableDeclarationPart->variableDeclarations->push_back(variableDeclaration(tokenList));
+     tokenHead = tokenList->front();
+      if (tokenHead->getTokenName() == ";") {
+        tokenList->pop_front();
+        optionalVariableDeclarationsPart(tokenList, variableDeclarationPart);
+      }
+	}	
+}
+
+
+VariableDeclaration* AnalizadorSintactico::variableDeclaration(list<Token*>* tokenList) {
+   std::list<Identifier*>* identifierList = new list<Identifier*>();
+   identifierList->push_back(identifier(tokenList));
+   optionalVariableDeclarations(tokenList, identifierList);   
+   DataType* dataType = AnalizadorSintactico::dataType(tokenList);
+   return new VariableDeclaration(identifierList,dataType);
+}
+
+ void AnalizadorSintactico::optionalVariableDeclarations(list<Token*>* tokenList, std::list<Identifier*>* identifierList){
+   Token* tokenHead = tokenList->front();
+   tokenList->pop_front();
+   if (tokenHead->getTokenName() == ":") {
+      return;
+   }else if (tokenHead->getTokenName() == ",") {
+      identifierList->push_back(identifier(tokenList));
+      return optionalVariableDeclarations(tokenList, identifierList);
+   }
+   //error
+ }
+
+DataType* AnalizadorSintactico::dataType(list<Token*>* tokenList){
+   Token* tokenHead = tokenList->front();
+   if (tokenHead->getTokenName() == "char" || tokenHead->getTokenName() == "integer"|| tokenHead->getTokenName() == "boolean") {
+      return new DataType(simpleType(tokenList));
+   }else{
+      return new DataType(arrayType(tokenList));
+   }
+}
+
 StatementPart* AnalizadorSintactico::statementPart(list<Token*>* tokenList) {
-   return new StatementPart(compoundStatement(tokenList));
+  Token* tokenHead = tokenList->front();
+  if (tokenHead->getTokenName() == "begin"){
+    tokenList->pop_front();
+    return new StatementPart(compoundStatement(tokenList));
+  }return NULL;
 }
 
 CompoundStatement* AnalizadorSintactico::compoundStatement(list<Token*>* tokenList) {
@@ -69,10 +134,11 @@ void AnalizadorSintactico::optionalStatements(list<Token*>* tokenList, CompoundS
 }
 
 Statement* AnalizadorSintactico::statement(list<Token*>* tokenList){
-   Token* tokenHead = tokenList->front();
+   Token* tokenHead = tokenList->front();  
    if (tokenHead->getTokenName() == "begin" || tokenHead->getTokenName() == "if" || tokenHead->getTokenName() == "while"){
       return new Statement(structuredStatement(tokenList));
    }else{
+      cout << "Statement Call:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       return new Statement(simpleStatement(tokenList));
    }
 }
@@ -85,6 +151,7 @@ SimpleStatement* AnalizadorSintactico::simpleStatement(list<Token*>* tokenList){
       tokenList->pop_front();
       return new SimpleStatement(writeStatement(tokenList));
    }else{
+      cout << "Assignment Statement:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       return new SimpleStatement(assignmentStatement(tokenList));
    }
 }
@@ -107,11 +174,11 @@ ReadStatement* AnalizadorSintactico::readStatement(list<Token*>* tokenList){
    if (tokenHead->getTokenName() == "("){
       tokenList->pop_front();
       list<VariableNT*>* variableList = new list<VariableNT*>();
-      variableList->push_back(variable(tokenList));      
+      variableList->push_back(variable(tokenList));  
       ReadStatement* readStatement = new ReadStatement(variableList);
       optionalVariables(tokenList,readStatement);
       tokenHead = tokenList->front();
-      if (tokenHead->getTokenName() == ")"){
+      if (tokenHead->getTokenName() == ")"){        
          tokenList->pop_front();
          return readStatement;
       }
@@ -195,59 +262,6 @@ WhileStatement* AnalizadorSintactico::whileStatement(list<Token*>* tokenList){
    return NULL;
 }
 
-
-VariableDeclarationPart* AnalizadorSintactico::variableDeclarationPart(list<Token*>* tokenList) {
-   Token* tokenHead = tokenList->front();
-   if (tokenHead->getTokenName() == "var") {
-      tokenList->pop_front();
-   }
-   list<VariableDeclaration*>* variableDeclarations = new list<VariableDeclaration*>();
-   tokenHead = tokenList->front();
-   variableDeclarations->push_back(variableDeclaration(tokenList));
-   VariableDeclarationPart* variableDeclarationPart = new VariableDeclarationPart(variableDeclarations);
-   optionalVariableDeclarationsPart(tokenList, variableDeclarationPart);
-   return variableDeclarationPart;
-}
-
-void AnalizadorSintactico::optionalVariableDeclarationsPart(list<Token*>* tokenList, VariableDeclarationPart* variableDeclarationPart) {
-  Token* tokenHead = tokenList->front();
-	if (tokenHead->getTokenType() == TokenType::IDENTIFIER) {
-     variableDeclarationPart->variableDeclarations->push_back(variableDeclaration(tokenList));
-	}	
-}
-
-
-VariableDeclaration* AnalizadorSintactico::variableDeclaration(list<Token*>* tokenList) {
-   Token* tokenHead = tokenList->front();
-   std::list<Identifier*>* identifierList = new list<Identifier*>();
-   identifierList->push_back(new Identifier(tokenHead->getTokenName()));
-   optionalVariableDeclarations(tokenList, identifierList);
-   tokenHead = tokenList->front();
-   DataType* dataType = AnalizadorSintactico::dataType(tokenList);
-   return new VariableDeclaration(identifierList,dataType);
-}
-
- void AnalizadorSintactico::optionalVariableDeclarations(list<Token*>* tokenList, std::list<Identifier*>* identifierList){
-   Token* tokenHead = tokenList->front();
-   tokenList->pop_front();
-   if (tokenHead->getTokenName() == ":") {
-      return;
-   }else if (tokenHead->getTokenName() == ",") {
-      identifierList->push_back(new Identifier(tokenHead->getTokenName()));
-      return optionalVariableDeclarations(tokenList, identifierList);
-   }
-   //error
- }
-
-DataType* AnalizadorSintactico::dataType(list<Token*>* tokenList){
-   Token* tokenHead = tokenList->front();
-   if (tokenHead->getTokenName() == "char" || tokenHead->getTokenName() == "integer"|| tokenHead->getTokenName() == "boolean") {
-      return new DataType(simpleType(tokenList));
-   }else{
-      return new DataType(arrayType(tokenList));
-   }
-}
-
 ArrayType* AnalizadorSintactico::arrayType(list<Token*>* tokenList){
    Token* tokenHead = tokenList->front();
    if (tokenHead->getTokenName() == "array"){
@@ -271,15 +285,14 @@ ArrayType* AnalizadorSintactico::arrayType(list<Token*>* tokenList){
 
 IndexRange* AnalizadorSintactico::indexRange(list<Token*>* tokenList){
    Token* tokenHead = tokenList->front();
-   std::locale loc;
-   if (isdigit(tokenHead->getTokenName(), loc)) {
+   if (strtol(tokenHead->getTokenName().data(), NULL, 10)) {
       int begin = atoi(tokenHead->getTokenName().data());
       tokenList->pop_front();
       tokenHead = tokenList->front();
       if (tokenHead->getTokenName() == "..") {
         tokenList->pop_front();
         tokenHead = tokenList->front();
-        if (isdigit(tokenHead->getTokenName(), loc)) {
+        if (strtol(tokenHead->getTokenName().data(), NULL, 10)) {
           tokenList->pop_front();
           int end = atoi(tokenHead->getTokenName().data());
           return new IndexRange(begin,end);
@@ -307,16 +320,13 @@ TypeIdentifier* AnalizadorSintactico::typeIdentifier(list<Token*>* tokenList){
 }
 
 VariableNT* AnalizadorSintactico::variable(list<Token*>* tokenList){
-   // return new Variable();
    Token* tokenHead = tokenList->front();
    tokenList->pop_front();
    Token* brackets = tokenList->front();
    if (brackets->getTokenName() == "["){
-      tokenList->push_back(brackets);
       tokenList->push_back(tokenHead);
       return new VariableNT(indexedVariable(tokenList));
-   }else{
-      tokenList->push_front(brackets);
+   }else{  
       tokenList->push_front(tokenHead);
       return new VariableNT(entireVariable(tokenList));
    }
@@ -352,8 +362,10 @@ ArrayVariable* AnalizadorSintactico::arrayVariable(list<Token*>* tokenList){
 }
 
 Expression* AnalizadorSintactico::expression(list<Token*>* tokenList){
-   SimpleExpression* firstExp = simpleExpression(tokenList);
    Token* tokenHead = tokenList->front();
+   SimpleExpression* firstExp = simpleExpression(tokenList);
+   tokenHead = tokenList->front();
+   cout << "Expresion Final Final:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    RelationalOperator op = Helpers::stringToRelationalOperator(tokenHead->getTokenName());
    if (op!= RelationalOperator::UNKNOWN){
       tokenList->pop_front();
@@ -363,18 +375,21 @@ Expression* AnalizadorSintactico::expression(list<Token*>* tokenList){
    return new Expression(firstExp);
 }
 SimpleExpression* AnalizadorSintactico::simpleExpression(list<Token*>* tokenList){
-   Token* tokenHead = tokenList->front();
+   Token* tokenHead = tokenList->front();    
    std::list<Term*>* terms = new list<Term*>();
    std::list<AdditionOperator>* operators = new list<AdditionOperator>();
    Sign sign = Helpers::stringToSign(tokenHead->getTokenName()); 
    terms->push_back(term(tokenList));
    SimpleExpression* expression = new SimpleExpression(sign,terms,operators);
    optionalTerms(tokenList,expression);
+   tokenHead = tokenList->front();
+   cout << "Expresion Final:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    return expression;
 }
 
 void AnalizadorSintactico::optionalTerms(list<Token*>* tokenList,SimpleExpression* simpleExpression){
   string token = tokenList->front()->getTokenName();
+  cout << "Simple Expression:" << token << " : " << endl;
   AdditionOperator op = Helpers::stringToAdditionOperator(token); 
   if (op!= AdditionOperator::UNKNOWN){ 
    simpleExpression->additionOperators->push_back(op);
@@ -388,10 +403,16 @@ void AnalizadorSintactico::optionalTerms(list<Token*>* tokenList,SimpleExpressio
 Term* AnalizadorSintactico::term(list<Token*>* tokenList){
    std::list<AbstractFactor*>* factors = new list<AbstractFactor*>();
    std::list<MultiplicationOperator>* operators = new list<MultiplicationOperator>();
+   Token* tokenHead = tokenList->front();
+   cout << "Token Actual Termino:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    AbstractFactor* firstFactor = factor(tokenList);
+   tokenHead = tokenList->front();
+   cout << "Token despues Termino:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    factors->push_back(firstFactor);
    Term* term = new Term(factors,operators);
    optionalFactors(tokenList,term);
+   tokenHead = tokenList->front();
+   cout << " Termino Final:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    return term;
 }
 
@@ -409,29 +430,31 @@ void AnalizadorSintactico::optionalFactors(list<Token*>* tokenList,Term* term){
 
 AbstractFactor* AnalizadorSintactico::factor(list<Token*>* tokenList){
    Token* tokenHead = tokenList->front();
-   tokenList->pop_front();
-   std::locale loc;
    //if variable{} if constant identifier
-  
    if (tokenHead->getTokenName() == "\'" || tokenHead->getTokenName() == "\"") { //constant string
       tokenHead = tokenList->front();
+      cout << "String:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       tokenList->pop_front();
       tokenList->pop_front();
       return new Factor(new Constant(tokenHead->getTokenName()));
-   }else if (isdigit(tokenHead->getTokenName(), loc)) { //constant digit
+   }else if (strtol(tokenHead->getTokenName().data(), NULL, 10)) { //constant digit
       tokenHead = tokenList->front();
+      cout << "Digit:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       tokenList->pop_front();
       return new Factor(new Constant(atoi(tokenHead->getTokenName().data())));
    }else if (tokenHead->getTokenType() == TokenType::IDENTIFIER) {
-      tokenList->pop_front();
+      cout << "Variable:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       return new Factor(variable(tokenList));
    }else if (tokenHead->getTokenName() == "not") { //not
       tokenHead = tokenList->front();
+      cout << "Not Factor:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       tokenList->pop_front();
       return new NotFactor(factor(tokenList));
    }else if (tokenHead->getTokenName() == "(") { //(expr)
-      expression(tokenList);
+      cout << "(exp):" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
+      Expression* exp =  expression(tokenList);
       tokenHead = tokenList->front();
+      cout << "(exp) despues:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       if (tokenHead->getTokenName() == ")") {
          tokenList->pop_front();
       }

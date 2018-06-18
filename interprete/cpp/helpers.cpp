@@ -53,3 +53,82 @@ MultiplicationOperator Helpers::stringToMultiplicationOperator(std::string strin
         return MultiplicationOperator::UNKNOWN;
     }
 }
+
+string Helpers::TokenTypeToString(TokenType token){
+    switch(token){
+        case(TokenType::IDENTIFIER):
+            return "Identifier";
+            break;
+        case(TokenType::DIGIT):
+            return "Digit";
+            break;
+        case(TokenType::KEYWORDS):
+            return "Keywords";
+            break;
+        case(TokenType::SYMBOL):
+            return "Symbol";
+            break;
+        case(TokenType::UNKNOWN):
+            return "UNKNOWN";
+            break;
+        default:
+            return "NULL";
+            break;
+    }
+}
+
+
+string Helpers::SimpleTypeToString(SimpleType token){
+    switch(token){
+        case(SimpleType::BOOLEAN):
+            return "Boolean";
+            break;
+        case(SimpleType::CHAR):
+            return "Char";
+            break;
+        case(SimpleType::INTEGER):
+            return "Int";
+            break;
+        case(SimpleType::UNKNOWN):
+            return "UNKNOWN";
+            break;
+        default:
+            return "NULL";
+            break;
+    }
+}
+
+string Helpers::RelationalOperatorToString(RelationalOperator token){
+    switch(token){
+        case(RelationalOperator::EQ):
+            return "=";
+            break;
+        case(RelationalOperator::NEQ):
+            return "<>";
+            break;
+        case(RelationalOperator::LT):
+            return "<";
+            break;
+        case(RelationalOperator::LEQ):
+            return "<=";
+            break;
+        case(RelationalOperator::GEQ):
+            return ">=";
+            break;
+        case(RelationalOperator::GT):
+            return ">";
+            break;
+        case(RelationalOperator::OR):
+            return "or";
+            break;
+        case(RelationalOperator::AND):
+            return "and";
+            break;
+        case(RelationalOperator::UNKNOWN):
+            return "UNKNOWN";
+            break;
+        default:
+            return "UNKNOWN";
+            break;
+    }
+}
