@@ -31,6 +31,7 @@ class AnalizadorSintactico {
       static StatementPart* statementPart(list<Token*>* tokenList);
       static CompoundStatement* compoundStatement(list<Token*>* tokenList);
       static Statement* statement(list<Token*>* tokenList);
+      static void optionalStatements(list<Token*>* tokenList, CompoundStatement* compoundStatement);
 
       static SimpleStatement* simpleStatement(list<Token*>* tokenList);
       static AssignmentStatement* assignmentStatement(list<Token*>* tokenList);

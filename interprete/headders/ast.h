@@ -52,6 +52,7 @@ class TypeIdentifier : public Node {
 };
 
 enum class SimpleType{
+   UNKNOWN,
    CHAR,
    INTEGER,
    BOOLEAN

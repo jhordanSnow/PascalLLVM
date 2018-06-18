@@ -1,4 +1,5 @@
 #include <headders/ast.h>
+#include <headders/env.h>
 #include<string>
 #include<list>
 #include<limits>
@@ -114,6 +115,16 @@ Expression::Expression(SimpleExpression* simpleExpression1, RelationalOperator r
 WhileStatement::WhileStatement(Expression* expression, Statement* statement) : Node() {
    this->expression = expression;
    this->statement = statement;
+}
+
+IfStatement::IfStatement(Expression* expression, Statement* thenStatement){
+   this->expression = expression;
+   this->statement = statement;
+}
+IfStatement::IfStatement(Expression* expression, Statement* thenStatement, Statement* elseStatement){
+   this->expression = expression;
+   this->statement = statement;
+   this->elseStatement = elseStatement;
 }
 
 StructuredStatement::StructuredStatement(CompoundStatement* compoundStatement) : Node() {

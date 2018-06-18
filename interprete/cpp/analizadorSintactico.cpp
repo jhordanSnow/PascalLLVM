@@ -48,12 +48,25 @@ StatementPart* AnalizadorSintactico::statementPart(list<Token*>* tokenList) {
 }
 
 CompoundStatement* AnalizadorSintactico::compoundStatement(list<Token*>* tokenList) {
-   Statement* statement = AnalizadorSintactico::statement(tokenList);
+   list<Statement*>* statementList = new list<Statement*>();
+   statementList->push_back(AnalizadorSintactico::statement(tokenList));
+   CompoundStatement* statement = new CompoundStatement(statementList);
+   optionalStatements(tokenList,statement);
    Token* tokenHead = tokenList->front();
    if (tokenHead->getTokenName() == "end") {
       tokenList->pop_front();
    }
-   return new CompoundStatement({});
+   return statement;
+}
+
+void AnalizadorSintactico::optionalStatements(list<Token*>* tokenList, CompoundStatement* compoundStatement){
+   Token* tokenHead = tokenList->front();
+   if (tokenHead->getTokenName() == ";"){
+     tokenList->pop_front();
+     compoundStatement->statementList->push_back(AnalizadorSintactico::statement(tokenList));
+     optionalStatements(tokenList, compoundStatement);
+   }
+   
 }
 
 Statement* AnalizadorSintactico::statement(list<Token*>* tokenList){
@@ -86,7 +99,7 @@ AssignmentStatement* AnalizadorSintactico::assignmentStatement(list<Token*>* tok
       Expression* expression = AnalizadorSintactico::expression(tokenList);
       return new AssignmentStatement(variable, expression);
    }else{
-      //error
+      return new AssignmentStatement(variable, NULL);
    }
 }
 
@@ -104,6 +117,7 @@ ReadStatement* AnalizadorSintactico::readStatement(list<Token*>* tokenList){
          return readStatement;
       }
    }
+   return NULL;
 }
 
 void AnalizadorSintactico::optionalVariables(list<Token*>* tokenList, ReadStatement* readStatement){
@@ -128,6 +142,7 @@ WriteStatement* AnalizadorSintactico::writeStatement(list<Token*>* tokenList){
          return writeStatement;
       }
    }
+   return NULL;
 }
 
 void AnalizadorSintactico::optionalVariables(list<Token*>* tokenList, WriteStatement* writeStatement){
@@ -149,6 +164,7 @@ StructuredStatement* AnalizadorSintactico::structuredStatement(list<Token*>* tok
    }else if(tokenHead->getTokenName() == "while"){
       return new StructuredStatement(whileStatement(tokenList));
    }
+   return NULL;
 }
 
 IfStatement* AnalizadorSintactico::ifStatement(list<Token*>* tokenList){
@@ -166,6 +182,7 @@ IfStatement* AnalizadorSintactico::ifStatement(list<Token*>* tokenList){
          return new IfStatement(ifExpression, thenStatement);
       }
    }
+   return NULL;
 }
 
 WhileStatement* AnalizadorSintactico::whileStatement(list<Token*>* tokenList){
@@ -176,6 +193,7 @@ WhileStatement* AnalizadorSintactico::whileStatement(list<Token*>* tokenList){
       Statement* doStatement = AnalizadorSintactico::statement(tokenList);
       return new WhileStatement(whileExpression, doStatement);
    }
+   return NULL;
 }
 
 
@@ -249,6 +267,7 @@ ArrayType* AnalizadorSintactico::arrayType(list<Token*>* tokenList){
          }
       }
    }
+   return NULL;
 }
 
 IndexRange* AnalizadorSintactico::indexRange(list<Token*>* tokenList){
@@ -268,6 +287,7 @@ IndexRange* AnalizadorSintactico::indexRange(list<Token*>* tokenList){
         }
       }   
    }  
+   return NULL;
 }
 
 SimpleType AnalizadorSintactico::simpleType(list<Token*>* tokenList){
@@ -280,13 +300,12 @@ SimpleType AnalizadorSintactico::simpleType(list<Token*>* tokenList){
    }else if (tokenHead->getTokenName() == "boolean") {
       return SimpleType::BOOLEAN;
    }
+   return SimpleType::UNKNOWN;
 }
 
 TypeIdentifier* AnalizadorSintactico::typeIdentifier(list<Token*>* tokenList){
    return new TypeIdentifier(identifier(tokenList));
 }
-
-
 
 VariableNT* AnalizadorSintactico::variable(list<Token*>* tokenList){
    // return new Variable();
@@ -324,9 +343,8 @@ IndexedVariable* AnalizadorSintactico::indexedVariable(list<Token*>* tokenList){
       }else{
         //No hay cerrar parentesis ]
       }
-   }else{
-     //No hay [
-   }
+   }//no hay
+   return NULL;
 
 }
 
