@@ -425,7 +425,7 @@ AbstractFactor* AnalizadorSintactico::factor(list<Token*>* tokenList){
       return new Factor(new Constant(atoi(tokenHead->getTokenName().data())));
    }else if (tokenHead->getTokenType() == TokenType::IDENTIFIER) {
       tokenList->pop_front();
-      //return new Factor(AnalizadorSintactico::identifier(tokenList));
+      return new Factor(variable(tokenList));
    }else if (tokenHead->getTokenName() == "not") { //not
       tokenHead = tokenList->front();
       tokenList->pop_front();
