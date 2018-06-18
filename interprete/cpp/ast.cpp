@@ -1,4 +1,5 @@
 #include <headders/ast.h>
+#include <headders/env.h>
 #include<string>
 #include<list>
 #include<limits>
@@ -89,12 +90,12 @@ Factor::Factor(Constant* constant) : AbstractFactor() {
    this->variable = 0;
 }
 
-Term::Term(std::list<Factor*>* factors, std::list<MultiplicationOperator*>* operators) : Node() {
+Term::Term(std::list<AbstractFactor*>* factors, std::list<MultiplicationOperator>* operators) : Node() {
    this->factors = factors;
    this->operators = operators;
 }
 
-SimpleExpression::SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator*>* additionOperators) : Node() {
+SimpleExpression::SimpleExpression(Sign sign, std::list<Term*>* terms, std::list<AdditionOperator>* additionOperators) : Node() {
    this->sign = sign;
    this->terms = terms;
    this->additionOperators = additionOperators;
@@ -114,6 +115,16 @@ Expression::Expression(SimpleExpression* simpleExpression1, RelationalOperator r
 WhileStatement::WhileStatement(Expression* expression, Statement* statement) : Node() {
    this->expression = expression;
    this->statement = statement;
+}
+
+IfStatement::IfStatement(Expression* expression, Statement* thenStatement){
+   this->expression = expression;
+   this->statement = statement;
+}
+IfStatement::IfStatement(Expression* expression, Statement* thenStatement, Statement* elseStatement){
+   this->expression = expression;
+   this->statement = statement;
+   this->elseStatement = elseStatement;
 }
 
 StructuredStatement::StructuredStatement(CompoundStatement* compoundStatement) : Node() {
@@ -396,6 +407,10 @@ void Program::execute () {
 
 #if false
 //macros
-//^yiwPa::f;s {
-//kf(yi)jVp:s/, /\n/€kb€kbr/g€kbeVi}^:normal daWVi}^:normal yaWA = pA;Vi{^I	this->
+//^yiwPa::f;s {
+
+//kf(yi)jVp:s/, /\n/ï¿½kbï¿½kbr/gï¿½kbe
+Vi}^:normal daW
+Vi}^:normal yaWA = pA;
+Vi{^I	this->
 #endif
