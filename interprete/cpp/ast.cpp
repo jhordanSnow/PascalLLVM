@@ -106,11 +106,19 @@ NotFactor::NotFactor(AbstractFactor* factor) : AbstractFactor() {
 Factor::Factor(VariableNT* variable) : AbstractFactor() {
    this->variable = variable;
    this->constant = 0;
+   this->expression = 0;
 }
 
 Factor::Factor(Constant* constant) : AbstractFactor() {
    this->constant = constant;
    this->variable = 0;
+   this->expression = 0;
+}
+
+Factor::Factor(Expression* expression) : AbstractFactor() {
+   this->constant = 0;
+   this->variable = 0;
+   this->expression = expression;
 }
 
 void Factor::execute(){
@@ -119,6 +127,9 @@ void Factor::execute(){
   }else if (this->variable != 0){
     this->variable->execute();
     this->value = this->variable->value;
+  } else if (this->expression != 0) {
+   this->expression->execute();
+   this->value = this->expression->value;
   }
 }
 
@@ -220,14 +231,34 @@ WhileStatement::WhileStatement(Expression* expression, Statement* statement) : N
    this->statement = statement;
 }
 
+void WhileStatement::execute(){
+  expression->execute();
+  while (expression->value) {
+    statement->execute();
+    expression->execute();
+  }
+}
+
 IfStatement::IfStatement(Expression* expression, Statement* thenStatement){
    this->expression = expression;
    this->statement = statement;
 }
+
 IfStatement::IfStatement(Expression* expression, Statement* thenStatement, Statement* elseStatement){
    this->expression = expression;
    this->statement = statement;
    this->elseStatement = elseStatement;
+}
+
+void IfStatement::execute(){
+  expression->execute();
+  if (expression->value){
+    statement->execute();
+  }else{
+    if (elseStatement != 0){
+      elseStatement->execute();
+    }
+  }
 }
 
 StructuredStatement::StructuredStatement(CompoundStatement* compoundStatement) : Node() {
@@ -249,7 +280,13 @@ StructuredStatement::StructuredStatement(WhileStatement* whileStatement) : Node(
 }
 
 void StructuredStatement::execute() {
-   // FALTA
+   if (this->compoundStatement != 0){
+     this->compoundStatement->execute();
+   }else if (this->ifStatement != 0){
+     this->ifStatement->execute();
+   }else if (this->whileStatement != 0){
+     this->whileStatement->execute();
+   }
 }
 
 WriteStatement::WriteStatement(list<VariableNT*>* variableList) : Node() {

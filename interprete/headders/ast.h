@@ -191,8 +191,10 @@ class Factor : public AbstractFactor {
    public:
       Factor(VariableNT* variable);
       Factor(Constant* constant);
+      Factor(Expression* expression);
       VariableNT* variable;
       Constant* constant;
+      Expression* expression;
       void execute();
       void print();
 };
