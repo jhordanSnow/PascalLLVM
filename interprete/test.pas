@@ -1,10 +1,12 @@
 program foo;
 // variables globales
-var a, b, c, d: integer; e: char;
+var a : array [0..6] of char;
 
 // compound statements: "main"
 begin
-   read(a, b, c, d);
-   a := (b+c)*d div a;
-   write(a)
+    a := 2;
+    while a=a do
+        begin 
+            write(a)
+        end
 end.

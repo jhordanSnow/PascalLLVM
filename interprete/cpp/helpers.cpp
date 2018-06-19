@@ -29,7 +29,7 @@ Sign Helpers::stringToSign(std::string string){
     }else if (string=="-"){
         return Sign::NEGATIVE;
     }else{
-        return Sign::POSITIVE;
+        return Sign::UNKNOWN;
     }
 }
 

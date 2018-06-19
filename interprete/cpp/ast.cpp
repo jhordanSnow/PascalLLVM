@@ -632,24 +632,25 @@ void TypeIdentifier::print() {
 
 void IndexRange::print() {
    cout << "IndexRange {" << endl;
-   cout << this->begining << endl;
-   cout << this->end << endl;
+   cout << "Beginning: " << this->begining << endl;
+   cout << "End:" << this->end << endl;
    cout << "}" << endl;
 };
 
 void ArrayType::print() {
    cout << "ArrayType {" << endl;
    if(indexRange != 0) indexRange->print();
+   cout << Helpers::SimpleTypeToString(simpleType) << endl;
    cout << "}" << endl;
 };
 
 void DataType::print() {
-   cout << "DataType { ";
+   cout << "DataType { " << endl;
    if(arrayType != 0) arrayType->print();
    else{ 
      cout << Helpers::SimpleTypeToString(simpleType);
    }
-   cout << " }" << endl;
+   cout << "}" << endl;
 };
 
 void VariableIdentifier::print() {
@@ -732,9 +733,9 @@ void WhileStatement::print() {
 
 void IfStatement::print() {
    cout << "If statement {" << endl;
-   if(expression != 0) expression->print();
-   if(statement != 0) statement->print();
-   if(elseStatement != 0) elseStatement->print();
+   if(this->expression != 0) this->expression->print();
+   if(this->statement != 0) this->statement->print();
+   if(this->elseStatement != 0) this->elseStatement->print();
    cout << "}" << endl;
 };
 
@@ -747,7 +748,7 @@ void StructuredStatement::print() {
 };
 
 void WriteStatement::print() {
-   cout << "Write Statement" << endl;
+   cout << "Write Statement {" << endl;
    for (list<VariableNT*>::iterator it = variableList->begin(); it != variableList->end(); ++it) {
       VariableNT* var = (*it);
       var->print();

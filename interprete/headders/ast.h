@@ -170,6 +170,7 @@ enum class MultiplicationOperator{
 };
 
 enum class Sign {
+   UNKNOWN,  
    POSITIVE,
    NEGATIVE
 };
