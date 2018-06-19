@@ -163,8 +163,9 @@ void Term::execute(){
     }
     // Lanzar error tal vez (?)
     if (this->operators->size() > 0 && itFact > 0){
-      MultiplicationOperator mulOperator = this->operators->front();
-      this->operators->pop_front();
+      list<MultiplicationOperator>::iterator mulIt = this->operators->begin();
+      advance(mulIt, itFact - 1);
+      MultiplicationOperator mulOperator = *mulIt;
       if (mulOperator == MultiplicationOperator::MUL){
         termValue *= factTemp->value;
       }else if (mulOperator == MultiplicationOperator::DIV && factTemp->value > 0){
@@ -195,8 +196,9 @@ void SimpleExpression::execute(){
       expValueS = tempTerm->stringValue;
     }
     if (this->additionOperators->size() > 0 && itTerm > 0){
-      AdditionOperator AddOperator = this->additionOperators->front();
-      this->additionOperators->pop_front();
+      list<AdditionOperator>::iterator addIt = this->additionOperators->begin();
+      advance(addIt, itTerm - 1);
+      AdditionOperator AddOperator = *addIt;
       if (AddOperator == AdditionOperator::ADD){
         expValue += tempTerm->value;
         expValueS += tempTerm->stringValue;
