@@ -101,10 +101,13 @@ void VariableNT::execute(){
   }
 }
 
-void AbstractFactor::execute(){}
-
 NotFactor::NotFactor(AbstractFactor* factor) : AbstractFactor() {
    this->factor = factor;
+}
+
+void NotFactor::execute(){
+  this->factor->execute();
+  this->factor->value = (this->factor->value == 0) ? 1 : 0;
 }
 
 Factor::Factor(VariableNT* variable) : AbstractFactor() {
@@ -164,7 +167,7 @@ void Term::execute(){
       this->operators->pop_front();
       if (mulOperator == MultiplicationOperator::MUL){
         termValue *= factTemp->value;
-      }else if (mulOperator == MultiplicationOperator::DIV){
+      }else if (mulOperator == MultiplicationOperator::DIV && factTemp->value > 0){
         termValue /= factTemp->value;
       }
     }
@@ -646,7 +649,7 @@ void ArrayType::print() {
 void DataType::print() {
    cout << "DataType { ";
    if(arrayType != 0) arrayType->print();
-   else{ 
+   else{
      cout << Helpers::SimpleTypeToString(simpleType);
    }
    cout << " }" << endl;

@@ -176,10 +176,10 @@ enum class Sign {
 
 class AbstractFactor : public Node {
    public:
-      void execute();
       int value;
       string stringValue;
       int type;
+      virtual void execute() = 0;
       virtual void print() = 0;
 };
 
