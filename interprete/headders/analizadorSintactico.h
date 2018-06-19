@@ -58,7 +58,6 @@ class AnalizadorSintactico {
       static Term* term(list<Token*>* tokenList);
       static void optionalFactors(list<Token*>* tokenList, Term* term);
       static AbstractFactor* factor(list<Token*>* tokenList);
-      static Constant* constant(list<Token*>* tokenList);     
 
 
 };

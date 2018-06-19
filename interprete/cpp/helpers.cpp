@@ -47,7 +47,7 @@ AdditionOperator Helpers::stringToAdditionOperator(std::string string){
 MultiplicationOperator Helpers::stringToMultiplicationOperator(std::string string){
     if(string=="*"){
         return MultiplicationOperator::MUL;
-    }else if (string=="/"){
+    }else if (string=="div"){
         return MultiplicationOperator::DIV;
     }else{
         return MultiplicationOperator::UNKNOWN;

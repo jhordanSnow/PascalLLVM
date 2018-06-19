@@ -575,8 +575,8 @@ void ConstantIdentifier::print() {
 
 void Constant::print() {
    cout << "constant {" << endl;
-   cout << this->stringConst << endl;
-   cout << this->constIdentifier << endl;
+   if(this->stringConst != "") cout << this->stringConst << endl;
+   cout << this->intConst << endl;
    if(constIdentifier != 0) constIdentifier->print();
    cout << "}" << endl;
 };
@@ -651,6 +651,7 @@ void Factor::print() {
    cout << "factor {" << endl;
    if(variable != 0) variable->print();
    if(constant != 0) constant->print();
+   if(expression != 0) expression->print();
    cout << "}" << endl;
 };
 

@@ -203,6 +203,7 @@ WriteStatement* AnalizadorSintactico::writeStatement(list<Token*>* tokenList){
       variableList->push_back(variable(tokenList)); 
       WriteStatement* writeStatement = new WriteStatement(variableList);
       optionalVariables(tokenList,writeStatement);
+      tokenHead = tokenList->front();
       if (tokenHead->getTokenName() == ")"){
          tokenList->pop_front();
          return writeStatement;
@@ -365,7 +366,6 @@ Expression* AnalizadorSintactico::expression(list<Token*>* tokenList){
    Token* tokenHead = tokenList->front();
    SimpleExpression* firstExp = simpleExpression(tokenList);
    tokenHead = tokenList->front();
-   cout << "Expresion Final Final:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    RelationalOperator op = Helpers::stringToRelationalOperator(tokenHead->getTokenName());
    if (op!= RelationalOperator::UNKNOWN){
       tokenList->pop_front();
@@ -375,21 +375,18 @@ Expression* AnalizadorSintactico::expression(list<Token*>* tokenList){
    return new Expression(firstExp);
 }
 SimpleExpression* AnalizadorSintactico::simpleExpression(list<Token*>* tokenList){
-   Token* tokenHead = tokenList->front();    
+   Token* tokenHead = tokenList->front();
    std::list<Term*>* terms = new list<Term*>();
    std::list<AdditionOperator>* operators = new list<AdditionOperator>();
    Sign sign = Helpers::stringToSign(tokenHead->getTokenName()); 
    terms->push_back(term(tokenList));
    SimpleExpression* expression = new SimpleExpression(sign,terms,operators);
    optionalTerms(tokenList,expression);
-   tokenHead = tokenList->front();
-   cout << "Expresion Final:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    return expression;
 }
 
 void AnalizadorSintactico::optionalTerms(list<Token*>* tokenList,SimpleExpression* simpleExpression){
   string token = tokenList->front()->getTokenName();
-  cout << "Simple Expression:" << token << " : " << endl;
   AdditionOperator op = Helpers::stringToAdditionOperator(token); 
   if (op!= AdditionOperator::UNKNOWN){ 
    simpleExpression->additionOperators->push_back(op);
@@ -403,16 +400,10 @@ void AnalizadorSintactico::optionalTerms(list<Token*>* tokenList,SimpleExpressio
 Term* AnalizadorSintactico::term(list<Token*>* tokenList){
    std::list<AbstractFactor*>* factors = new list<AbstractFactor*>();
    std::list<MultiplicationOperator>* operators = new list<MultiplicationOperator>();
-   Token* tokenHead = tokenList->front();
-   cout << "Token Actual Termino:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    AbstractFactor* firstFactor = factor(tokenList);
-   tokenHead = tokenList->front();
-   cout << "Token despues Termino:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    factors->push_back(firstFactor);
    Term* term = new Term(factors,operators);
    optionalFactors(tokenList,term);
-   tokenHead = tokenList->front();
-   cout << " Termino Final:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
    return term;
 }
 
@@ -432,18 +423,19 @@ AbstractFactor* AnalizadorSintactico::factor(list<Token*>* tokenList){
    Token* tokenHead = tokenList->front();
    //if variable{} if constant identifier
    if (tokenHead->getTokenName() == "\'" || tokenHead->getTokenName() == "\"") { //constant string
+      tokenList->pop_front();
       tokenHead = tokenList->front();
-      cout << "String:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
+      Constant* string = new Constant(tokenHead->getTokenName());
       tokenList->pop_front();
       tokenList->pop_front();
-      return new Factor(new Constant(tokenHead->getTokenName()));
+      tokenHead = tokenList->front();
+      cout << "Next:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
+      return new Factor(string);
    }else if (strtol(tokenHead->getTokenName().data(), NULL, 10)) { //constant digit
       tokenHead = tokenList->front();
-      cout << "Digit:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       tokenList->pop_front();
       return new Factor(new Constant(atoi(tokenHead->getTokenName().data())));
    }else if (tokenHead->getTokenType() == TokenType::IDENTIFIER) {
-      cout << "Variable:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       return new Factor(variable(tokenList));
    }else if (tokenHead->getTokenName() == "not") { //not
       tokenHead = tokenList->front();
@@ -452,11 +444,13 @@ AbstractFactor* AnalizadorSintactico::factor(list<Token*>* tokenList){
       return new NotFactor(factor(tokenList));
    }else if (tokenHead->getTokenName() == "(") { //(expr)
       cout << "(exp):" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
+      tokenList->pop_front();
       Expression* exp =  expression(tokenList);
       tokenHead = tokenList->front();
       cout << "(exp) despues:" << tokenHead->getTokenName() << " : " <<  Helpers::TokenTypeToString(tokenHead->getTokenType()) << endl;
       if (tokenHead->getTokenName() == ")") {
          tokenList->pop_front();
+         return new Factor(exp);
       }
    }else{
       return new Factor(new VariableNT(entireVariable(tokenList)));
