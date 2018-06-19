@@ -104,17 +104,13 @@ int main(int argc, char** argv) {
 
    list<string>* code = getInputStream(argv[1]);
    list<Token*>* tokens = lexer->tokenize(code);
-
-   for (list<Token*>::iterator it = tokens->begin(); it != tokens->end(); ++it){
+   /*for (list<Token*>::iterator it = tokens->begin(); it != tokens->end(); ++it){
      Token* t = (*it);
      std::cout << t->getTokenLocation() << ": " << t->getTokenName() << "\n";
-   }
-
-   std::cout << "Tokens - " << tokens->size() << '\n';
+   }*/
 
    Program* p = AnalizadorSintactico::analizar(tokens);
-   p->print();
-
+   //p->print();
    p->execute();
 
    return 0;
