@@ -296,7 +296,8 @@ IndexRange* AnalizadorSintactico::indexRange(list<Token*>* tokenList){
         if (strtol(tokenHead->getTokenName().data(), NULL, 10)) {
           tokenList->pop_front();
           int end = atoi(tokenHead->getTokenName().data());
-          return new IndexRange(begin,end);
+          IndexRange* ir = new IndexRange(begin,end);
+          return ir;
         }
       }   
    }  
@@ -325,7 +326,7 @@ VariableNT* AnalizadorSintactico::variable(list<Token*>* tokenList){
    tokenList->pop_front();
    Token* brackets = tokenList->front();
    if (brackets->getTokenName() == "["){
-      tokenList->push_back(tokenHead);
+      tokenList->push_front(tokenHead);
       return new VariableNT(indexedVariable(tokenList));
    }else{  
       tokenList->push_front(tokenHead);

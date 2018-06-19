@@ -136,7 +136,7 @@ void Factor::execute(){
   }else if (this->variable != 0){
     this->variable->execute();
     this->value = this->variable->value;
-    this->stringValue = this->expression->stringValue;
+    this->stringValue = this->variable->stringValue;
     this->type = this->variable->value;
   } else if (this->expression != 0) {
    this->expression->execute();
