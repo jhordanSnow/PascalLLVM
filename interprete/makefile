@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall -I.
+CFLAGS=-Wall -I. -ggdb
 LIBS=
 SRC=$(wildcard *.cpp) ${wildcard cpp/*.cpp};
 
