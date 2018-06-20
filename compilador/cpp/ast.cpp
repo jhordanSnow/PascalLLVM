@@ -78,7 +78,7 @@ VariableNT::VariableNT(IndexedVariable* indexedVariable) : Node() {
    this->entireVariable = 0;
 }
 
-void VariableNT::codeGen(){
+string VariableNT::codeGen(){
   Enviroment* env = Enviroment::getInstance();
   if (this->entireVariable != 0){
     EnvVariable* var = env->getVariable(this->entireVariable->variableIdentifier->variableIdentifier->identifier);
@@ -99,15 +99,17 @@ void VariableNT::codeGen(){
     ArrayVariableEnv* arrayVar = (ArrayVariableEnv*)var;
     this->value = arrayVar->getInt(this->indexedVariable->expression->value);
   }
+  return "";
 }
 
 NotFactor::NotFactor(AbstractFactor* factor) : AbstractFactor() {
    this->factor = factor;
 }
 
-void NotFactor::codeGen(){
+string NotFactor::codeGen(){
   this->factor->codeGen();
   this->factor->value = (this->factor->value == 0) ? 1 : 0;
+  return "";
 }
 
 Factor::Factor(VariableNT* variable) : AbstractFactor() {
@@ -128,7 +130,7 @@ Factor::Factor(Expression* expression) : AbstractFactor() {
    this->expression = expression;
 }
 
-void Factor::codeGen(){
+string Factor::codeGen(){
   if (this->constant != 0) {
     this->value = this->constant->intConst;
     this->stringValue = this->constant->stringConst;
@@ -144,6 +146,7 @@ void Factor::codeGen(){
    this->stringValue = this->expression->stringValue;
    this->type = this->expression->type;
   }
+  return "";
 }
 
 Term::Term(list<AbstractFactor*>* factors, list<MultiplicationOperator>* operators) : Node() {
@@ -151,7 +154,7 @@ Term::Term(list<AbstractFactor*>* factors, list<MultiplicationOperator>* operato
    this->operators = operators;
 }
 
-void Term::codeGen(){
+string Term::codeGen(){
   int termValue = 1;
   int itFact = 0;
   for (list<AbstractFactor*>::iterator it = this->factors->begin(); it != this->factors->end(); ++it) {
@@ -176,6 +179,7 @@ void Term::codeGen(){
   }
   this->value = termValue;
   this->type = (this->stringValue != "") ? 3 : 1;
+  return "";
 }
 
 SimpleExpression::SimpleExpression(Sign sign, list<Term*>* terms, list<AdditionOperator>* additionOperators) : Node() {
@@ -184,7 +188,7 @@ SimpleExpression::SimpleExpression(Sign sign, list<Term*>* terms, list<AdditionO
    this->additionOperators = additionOperators;
 }
 
-void SimpleExpression::codeGen(){
+string SimpleExpression::codeGen(){
   int expValue = 0;
   string expValueS = "";
   int itTerm = 0;
@@ -211,6 +215,7 @@ void SimpleExpression::codeGen(){
   this->stringValue = expValueS;
   this->value = expValue;
   this->type = (this->stringValue != "") ? 3 : 1;
+  return "";
 }
 
 Expression::Expression(SimpleExpression* simpleExpression1) : Node() {
@@ -224,7 +229,7 @@ Expression::Expression(SimpleExpression* simpleExpression1, RelationalOperator r
    this->simpleExpression2 = simpleExpression2;
 }
 
-void Expression::codeGen(){
+string Expression::codeGen(){
   this->simpleExpression1->codeGen();
   this->type = this->simpleExpression1->type;
   this->value = this->simpleExpression1->value;
@@ -249,6 +254,7 @@ void Expression::codeGen(){
       this->value = simpleExpression1->value && simpleExpression2->value;
     }
   }
+  return "";
 }
 
 WhileStatement::WhileStatement(Expression* expression, Statement* statement) : Node() {
@@ -256,12 +262,13 @@ WhileStatement::WhileStatement(Expression* expression, Statement* statement) : N
    this->statement = statement;
 }
 
-void WhileStatement::codeGen(){
+string WhileStatement::codeGen(){
   expression->codeGen();
   while (expression->value) {
     statement->codeGen();
     expression->codeGen();
   }
+  return "";
 }
 
 IfStatement::IfStatement(Expression* expression, Statement* thenStatement){
@@ -275,7 +282,7 @@ IfStatement::IfStatement(Expression* expression, Statement* thenStatement, State
    this->elseStatement = elseStatement;
 }
 
-void IfStatement::codeGen(){
+string IfStatement::codeGen(){
   expression->codeGen();
   if (expression->value){
     statement->codeGen();
@@ -284,6 +291,7 @@ void IfStatement::codeGen(){
       elseStatement->codeGen();
     }
   }
+  return "";
 }
 
 StructuredStatement::StructuredStatement(CompoundStatement* compoundStatement) : Node() {
@@ -304,7 +312,7 @@ StructuredStatement::StructuredStatement(WhileStatement* whileStatement) : Node(
    this->ifStatement = 0;
 }
 
-void StructuredStatement::codeGen() {
+string StructuredStatement::codeGen() {
    if (this->compoundStatement != 0){
      this->compoundStatement->codeGen();
    }else if (this->ifStatement != 0){
@@ -312,13 +320,14 @@ void StructuredStatement::codeGen() {
    }else if (this->whileStatement != 0){
      this->whileStatement->codeGen();
    }
+   return "";
 }
 
 WriteStatement::WriteStatement(list<VariableNT*>* variableList) : Node() {
    this->variableList = variableList;
 }
 
-void WriteStatement::codeGen() {
+string WriteStatement::codeGen() {
    for (list<VariableNT*>::iterator it = this->variableList->begin(); it != this->variableList->end(); ++it) {
       Enviroment* env = Enviroment::getInstance();
       VariableNT* requestedVar = (*it);
@@ -350,13 +359,14 @@ void WriteStatement::codeGen() {
 
       }
    }
+   return "";
 }
 
 ReadStatement::ReadStatement(list<VariableNT*>* variableList) : Node() {
    this->variableList = variableList;
 }
 
-void ReadStatement::codeGen() {
+string ReadStatement::codeGen() {
    for (list<VariableNT*>::iterator it = this->variableList->begin(); it != this->variableList->end(); ++it) {
       Enviroment* env = Enviroment::getInstance();
       VariableNT* requestedVar = (*it);
@@ -435,6 +445,7 @@ void ReadStatement::codeGen() {
          }
       }
    }
+   return "";
 }
 
 AssignmentStatement::AssignmentStatement(VariableNT* variable, Expression* expression) : Node() {
@@ -442,31 +453,16 @@ AssignmentStatement::AssignmentStatement(VariableNT* variable, Expression* expre
    this->expression = expression;
 }
 
-void AssignmentStatement::codeGen() {
-  Enviroment* env = Enviroment::getInstance();
-  this->expression->codeGen();
+string AssignmentStatement::codeGen() {
+  string code = "";
   if (this->variable->entireVariable != 0) {
-     EnvVariable* var = env->getVariable(this->variable->entireVariable->variableIdentifier->variableIdentifier->identifier);
-     int varType = var->getType();
-     if (varType == 1) {
-        ((IntVariable*)var)->setValue(this->expression->value);
-     } else if (varType == 2) {
-        ((BoolVariable*)var)->setValue((this->expression->value == 0) ? false : true);
-     } else if (varType == 3) {
-       ((StringVariable*)var)->setValue(this->expression->stringValue);
-     }
+     string identifier = this->variable->entireVariable->variableIdentifier->variableIdentifier->identifier;
+     code += identifier + " = " + this->expression->codeGen() + ";";
   } else { // indexed variable
-     ArrayVariableEnv* var = (ArrayVariableEnv*)env->getVariable(this->variable->indexedVariable->arrayVariable->entireVariable->variableIdentifier->variableIdentifier->identifier);
-     this->variable->indexedVariable->expression->codeGen();
-     int varType = var->getType();
-     if (varType == 1) {
-        var->setInt(this->variable->indexedVariable->expression->value, this->expression->value);
-     } else if (varType == 2) {
-        var->setBool(this->variable->indexedVariable->expression->value, (this->expression->value == 0) ? false : true);
-     } else if (varType == 3) {
-        var->setString(this->variable->indexedVariable->expression->value, this->expression->stringValue);
-     }
+     string identifier = this->variable->entireVariable->variableIdentifier->variableIdentifier->identifier;
+     code += identifier << "[" << this->variable->indexedVariable->expression->value << "] = " << this->variable->indexedVariable->expression->codeGen() << ";";
   }
+  return code;
 }
 
 SimpleStatement::SimpleStatement(AssignmentStatement* assignmentStatement) : Node() {
@@ -487,14 +483,16 @@ SimpleStatement::SimpleStatement(WriteStatement* writeStatement) : Node() {
    this->assignmentStatement = 0;
 }
 
-void SimpleStatement::codeGen() {
+string SimpleStatement::codeGen() {
+   string code = ""
    if (assignmentStatement != 0) {
-      this->assignmentStatement->codeGen();
+      code += this->assignmentStatement->codeGen();
    } else if (readStatement != 0) {
-      this->readStatement->codeGen();
+      code += this->readStatement->codeGen();
    } else if (writeStatement != 0) {
-      this->writeStatement->codeGen();
+      code += this->writeStatement->codeGen();
    }
+   return code;
 }
 
 Statement::Statement(SimpleStatement* simpleStatement) : Node() {
@@ -507,31 +505,36 @@ Statement::Statement(StructuredStatement* structuredStatement) : Node() {
    this->simpleStatement = 0;
 }
 
-void Statement::codeGen() {
+string Statement::codeGen() {
+   string code = "";
    if (this->simpleStatement != 0) {
-      this->simpleStatement->codeGen();
+      code += this->simpleStatement->codeGen();
    } else {
-      this->structuredStatement->codeGen();
+      code += this->structuredStatement->codeGen();
    }
+   return "";
 }
 
 CompoundStatement::CompoundStatement(list<Statement*>* statementList) : Node() {
    this->statementList = statementList;
 }
 
-void CompoundStatement::codeGen() {
+string CompoundStatement::codeGen() {
+   string code = "{\n";
    for (list<Statement*>::iterator it = this->statementList->begin(); it != this->statementList->end(); ++it) {
       Statement* s = (*it);
-      s->codeGen();
+      code += s->codeGen();
    }
+   code += "}\n";
+   return code;
 }
 
 StatementPart::StatementPart(CompoundStatement* compoundStatement) : Node() {
    this->compoundStatement = compoundStatement;
 }
 
-void StatementPart::codeGen() {
-   this->compoundStatement->codeGen();
+string StatementPart::codeGen() {
+   return this->compoundStatement->codeGen();
 }
 
 VariableDeclaration::VariableDeclaration(list<Identifier*>* identifierList, DataType* dataType) : Node() {
@@ -539,18 +542,18 @@ VariableDeclaration::VariableDeclaration(list<Identifier*>* identifierList, Data
    this->dataType = dataType;
 }
 
-void VariableDeclaration::codeGen() {
-   Enviroment* env = Enviroment::getInstance();
+string VariableDeclaration::codeGen() {
+   string code = "";
    DataType* dt = this->dataType;
    if (dt->arrayType == 0) { // si es un tipo simple
       for (list<Identifier*>::iterator it = this->identifierList->begin(); it != this->identifierList->end(); ++it) {
          Identifier* id = (*it);
          if (dt->simpleType == SimpleType::INTEGER){
-            env->addInt(id->identifier, 0);
+            code += "int " + id->identifier + " = 0;\n";
          } else if (dt->simpleType == SimpleType::BOOLEAN) {
-            env->addBool(id->identifier, false);
+            code += "bool " + id->identifier + " = false\n";
          } else if (dt->simpleType == SimpleType::CHAR) {
-            env->addString(id->identifier, "");
+            code +=  "string " + id->identifier + " = \"\";\n";
          }
       }
    } else { // si es un tipo array
@@ -559,14 +562,15 @@ void VariableDeclaration::codeGen() {
          ArrayType* at = dt->arrayType;
          IndexRange* ir = at->indexRange;
          if (at->simpleType == SimpleType::INTEGER){
-            env->addArray(id->identifier, ir->begining, ir->end, 1);
+            code += "int* " + id->identifier +  " = int[" + to_string(ir->end - ir->begining) +"]\n";
          } else if (at->simpleType == SimpleType::BOOLEAN) {
-            env->addArray(id->identifier, ir->begining, ir->end, 2);
+            code += "bool* " + id->identifier +  " = bool[" + to_string(ir->end - ir->begining) +"]\n";
          } else if (at->simpleType == SimpleType::CHAR) {
-            env->addArray(id->identifier, ir->begining, ir->end, 3);
+            code += "char* " + id->identifier +  " = char[" + to_string(ir->end - ir->begining) +"]\n";
          }
       }
    }
+   return code;
 }
 
 VariableDeclarationPart::VariableDeclarationPart(list<VariableDeclaration*>* variableDeclarations) : Node() {
@@ -577,11 +581,13 @@ VariableDeclarationPart::VariableDeclarationPart() : Node() {
    this->variableDeclarations = 0;
 }
 
-void VariableDeclarationPart::codeGen() {
+string VariableDeclarationPart::codeGen() {
+   string code;
    for (list<VariableDeclaration*>::iterator it = this->variableDeclarations->begin(); it != this->variableDeclarations->end(); ++it){
       VariableDeclaration* varDeclaration = (*it);
-      varDeclaration->codeGen();
+      code =varDeclaration->codeGen();
    }
+   return code;
 }
 
 Block::Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* statementPart) : Node() {
@@ -589,9 +595,9 @@ Block::Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* st
    this->statementPart = statementPart;
 }
 
-void Block::codeGen() {
-   this->variableDeclarationPart->codeGen();
-   this->statementPart->codeGen();
+string Block::codeGen() {
+   string code = this->variableDeclarationPart->codeGen() + "\n" + this->statementPart->codeGen() ;
+   return code;
 }
 
 Program::Program(Identifier* identifier, Block* block) : Node() {
@@ -599,8 +605,11 @@ Program::Program(Identifier* identifier, Block* block) : Node() {
    this->block = block;
 }
 
-void Program::codeGen () {
-   block->codeGen();
+string Program::codeGen () {
+   string code = "#include<stdio.h>\n#include<string.h>\n";
+   string blockCode = block->codeGen();
+   cout << "Code: " << code + blockCode << endl;
+   return code + blockCode;
 }
 
 // PRINTS
@@ -846,8 +855,9 @@ FunctionBlock::FunctionBlock(Block* block) : Node(){
   this->block = block;
 }
 
-void FunctionBlock::codeGen(){
+string FunctionBlock::codeGen(){
   block->codeGen();
+  return "";
 }
 
 Function::Function(Identifier* identifier, list<VariableDeclaration*>* variableDeclarations, FunctionBlock* block) : Node(){

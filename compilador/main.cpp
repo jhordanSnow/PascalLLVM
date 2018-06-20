@@ -48,8 +48,8 @@ int main(int argc, char** argv) {
    }
 
    Program* p = AnalizadorSintactico::analizar(tokens);
-   p->print();
-   //p->codeGen();
+   //p->print();
+   p->codeGen();
 
    return 0;
 }

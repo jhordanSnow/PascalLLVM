@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall -I.
+CFLAGS=-Wall -I. -ggdb
 LIBS=`llvm-config --cxxflags --ldflags --libs core`
 SRC=$(wildcard *.cpp) ${wildcard cpp/*.cpp};
 
