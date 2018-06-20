@@ -1,14 +1,25 @@
 program foo;
 // variables globales
-var a, b, c, d: integer; e: char; caca: array [1..100] of integer;
+var i, j, b, c, d: integer; msg: char; caca: array [1..100] of char;
 
 // compound statements: "main"
 begin
-    read(a,b,c);
-    // if b > a then write(b) else write(a);
-    while a<=b do
+  i := 0;
+  d := 1;
+  c := 0;
+  msg := 'Repeticiones ';
+  write(msg);
+  msg := '______________';
+  read(b);
+  while i < b do
+    begin
+      j := 0;
+      write(msg);
+      while j < b do
         begin
-            write(a);
-            a:=a+c
-        end
+          if j = i then write(d) else write(c);
+          j := j + 1
+        end;
+      i := i+1
+    end
 end.

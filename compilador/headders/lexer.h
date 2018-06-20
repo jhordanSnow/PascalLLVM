@@ -23,5 +23,5 @@ namespace MiniPascal{
       unsigned int charIterator;
       bool isComment;
   };
-};
+}
 #endif

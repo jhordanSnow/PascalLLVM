@@ -208,6 +208,7 @@ void SimpleExpression::execute(){
     }
     itTerm++;
   }
+  this->stringValue = expValueS;
   this->value = expValue;
   this->type = (this->stringValue != "") ? 3 : 1;
 }
@@ -265,12 +266,12 @@ void WhileStatement::execute(){
 
 IfStatement::IfStatement(Expression* expression, Statement* thenStatement){
    this->expression = expression;
-   this->statement = statement;
+   this->statement = thenStatement;
 }
 
 IfStatement::IfStatement(Expression* expression, Statement* thenStatement, Statement* elseStatement){
    this->expression = expression;
-   this->statement = statement;
+   this->statement = thenStatement;
    this->elseStatement = elseStatement;
 }
 
@@ -328,22 +329,23 @@ void WriteStatement::execute() {
          if (varType == 1) { // int
             IntVariable* intVar = (IntVariable*)var;
             cout << intVar->toString() << endl;
-         } else if (varType == 2) { // string
+         } else if (varType == 2) { // BOOL
             BoolVariable* boolVar = (BoolVariable*)var;
             cout << boolVar->toString() << endl;
-         } else if (varType == 3) { // boolean
+         } else if (varType == 3) { // CHAR
             StringVariable* stringVar = (StringVariable*)var;
             cout << stringVar->toString() << endl;
          }
       } else { // indexed variable
          ArrayVariableEnv* var = (ArrayVariableEnv*)env->getVariable(requestedVar->indexedVariable->arrayVariable->entireVariable->variableIdentifier->variableIdentifier->identifier);
+         requestedVar->indexedVariable->expression->execute();
          int varType = var->getType();
          if (varType == 1) { // int
-            cout << var->getInt(1) << endl;
+            cout << var->getInt(requestedVar->indexedVariable->expression->value) << endl;
          } else if (varType == 2) { // boolean
-            cout << var->getBool(1) << endl;
+            cout << var->getBool(requestedVar->indexedVariable->expression->value) << endl;
          } else if (varType == 3) { // string
-            cout << var->getString(1) << endl;
+            cout << var->getString(requestedVar->indexedVariable->expression->value) << endl;
          }
 
       }
@@ -396,7 +398,7 @@ void ReadStatement::execute() {
             }
             stringVar->setValue(newVar);
          }
-      } else { // indexed variable // FALTA Cambiar los 1 por expression
+      } else { // indexed variable
          ArrayVariableEnv* var = (ArrayVariableEnv*)env->getVariable(requestedVar->indexedVariable->arrayVariable->entireVariable->variableIdentifier->variableIdentifier->identifier);
          requestedVar->indexedVariable->expression->execute();
          int varType = var->getType();
@@ -545,10 +547,10 @@ void VariableDeclaration::execute() {
          Identifier* id = (*it);
          if (dt->simpleType == SimpleType::INTEGER){
             env->addInt(id->identifier, 0);
-         } else if (dt->simpleType == SimpleType::CHAR) {
-            env->addString(id->identifier, "");
          } else if (dt->simpleType == SimpleType::BOOLEAN) {
             env->addBool(id->identifier, false);
+         } else if (dt->simpleType == SimpleType::CHAR) {
+            env->addString(id->identifier, "");
          }
       }
    } else { // si es un tipo array
@@ -558,9 +560,9 @@ void VariableDeclaration::execute() {
          IndexRange* ir = at->indexRange;
          if (at->simpleType == SimpleType::INTEGER){
             env->addArray(id->identifier, ir->begining, ir->end, 1);
-         } else if (at->simpleType == SimpleType::CHAR) {
-            env->addArray(id->identifier, ir->begining, ir->end, 2);
          } else if (at->simpleType == SimpleType::BOOLEAN) {
+            env->addArray(id->identifier, ir->begining, ir->end, 2);
+         } else if (at->simpleType == SimpleType::CHAR) {
             env->addArray(id->identifier, ir->begining, ir->end, 3);
          }
       }

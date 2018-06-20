@@ -92,11 +92,11 @@ int ArrayVariableEnv::getType() {
 }
 
 int ArrayVariableEnv::getInt(int index) {
-   return intArray[index];
+   return intArray[index - this->begining];
 }
 
 string ArrayVariableEnv::getString(int index) {
-   return stringArray[index];
+   return stringArray[index - this->begining];
 }
 
 bool ArrayVariableEnv::getBool(int index) {

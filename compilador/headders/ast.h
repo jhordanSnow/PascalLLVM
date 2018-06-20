@@ -16,7 +16,7 @@ using namespace std;
 class Node {
    public:
       Node();
-      void execute();
+      void codeGen();
       virtual void print() = 0;
 };
 
@@ -26,7 +26,7 @@ class Identifier : public Node {
    public:
       Identifier(string identifier);
       string identifier;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -34,7 +34,7 @@ class ConstantIdentifier : public Node {
    public:
       ConstantIdentifier(Identifier* identifier);
       Identifier* identifier;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -46,7 +46,7 @@ class Constant : public Node {
       int intConst;
       string stringConst;
       ConstantIdentifier* constIdentifier;
-      void execute();
+      void codeGen();
       void print();
 };
 /* Lexical Grammar */
@@ -56,7 +56,7 @@ class TypeIdentifier : public Node {
    public:
       TypeIdentifier(Identifier* identifier);
       Identifier* identifier;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -72,7 +72,7 @@ class IndexRange : public Node {
       IndexRange(int begining, int end);
       int begining;
       int end;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -82,7 +82,7 @@ class ArrayType : public Node {
       ArrayType(IndexRange* indexRange, SimpleType simpleType);
       IndexRange* indexRange;
       SimpleType simpleType;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -92,7 +92,7 @@ class DataType : public Node {
       DataType(ArrayType* arrayType);
       SimpleType simpleType;
       ArrayType* arrayType;
-      void execute();
+      void codeGen();
       void print();
 };
 /* Types */
@@ -103,7 +103,7 @@ class VariableIdentifier : public Node {
    public:
       VariableIdentifier(Identifier* variableIdentifier);
       Identifier* variableIdentifier;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -111,7 +111,7 @@ class EntireVariable : public Node {
    public:
       EntireVariable(VariableIdentifier* variableIdentifier);
       VariableIdentifier* variableIdentifier;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -119,7 +119,7 @@ class ArrayVariable : public Node {
    public:
       ArrayVariable(EntireVariable* entireVariable);
       EntireVariable* entireVariable;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -128,7 +128,7 @@ class IndexedVariable : public Node {
       IndexedVariable(ArrayVariable* arrayVariable, Expression* expression);
       ArrayVariable* arrayVariable;
       Expression* expression;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -141,7 +141,7 @@ class VariableNT : public Node {
       int value;
       string stringValue;
       int type;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -170,7 +170,7 @@ enum class MultiplicationOperator{
 };
 
 enum class Sign {
-   UNKNOWN,  
+   UNKNOWN,
    POSITIVE,
    NEGATIVE
 };
@@ -180,7 +180,7 @@ class AbstractFactor : public Node {
       int value;
       string stringValue;
       int type;
-      virtual void execute() = 0;
+      virtual void codeGen() = 0;
       virtual void print() = 0;
 };
 
@@ -188,7 +188,7 @@ class NotFactor : public AbstractFactor {
    public:
       NotFactor(AbstractFactor* factor);
       AbstractFactor* factor;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -200,7 +200,7 @@ class Factor : public AbstractFactor {
       VariableNT* variable;
       Constant* constant;
       Expression* expression;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -212,7 +212,7 @@ class Term : public Node {
       int value;
       string stringValue;
       int type;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -225,7 +225,7 @@ class SimpleExpression : public Node {
       int value;
       string stringValue;
       int type;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -239,7 +239,7 @@ class Expression : public Node {
       int value;
       string stringValue;
       int type;
-      void execute();
+      void codeGen();
       void print();
 };
 /* Expressions */
@@ -252,7 +252,7 @@ class WhileStatement : public Node {
       WhileStatement(Expression* expression, Statement* statement);
       Expression* expression;
       Statement* statement;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -263,7 +263,7 @@ class IfStatement : public Node {
       Expression* expression;
       Statement* statement;
       Statement* elseStatement;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -275,7 +275,7 @@ class StructuredStatement : public Node {
       CompoundStatement* compoundStatement;
       IfStatement* ifStatement;
       WhileStatement* whileStatement;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -283,7 +283,7 @@ class WriteStatement : public Node {
    public:
       WriteStatement(list<VariableNT*>* variableList);
       list<VariableNT*>* variableList;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -291,7 +291,7 @@ class ReadStatement : public Node {
    public:
       ReadStatement(list<VariableNT*>* variableList);
       list<VariableNT*>* variableList;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -300,7 +300,7 @@ class AssignmentStatement : public Node {
       AssignmentStatement(VariableNT* variable, Expression* expression);
       VariableNT* variable;
       Expression* expression;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -312,7 +312,7 @@ class SimpleStatement : public Node {
       AssignmentStatement* assignmentStatement;
       ReadStatement* readStatement;
       WriteStatement* writeStatement;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -322,15 +322,15 @@ class Statement : public Node {
       Statement(StructuredStatement* structuredStatement);
       SimpleStatement* simpleStatement;
       StructuredStatement* structuredStatement;
-      void execute();
+      void codeGen();
       void print();
 };
-;
+
 class CompoundStatement : public Node {
    public:
       CompoundStatement(list<Statement*>* statementList);
       list<Statement*>* statementList;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -338,7 +338,7 @@ class StatementPart : public Node {
    public:
       StatementPart(CompoundStatement* compoundStatement);
       CompoundStatement* compoundStatement;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -349,7 +349,7 @@ class VariableDeclaration : public Node {
       VariableDeclaration(list<Identifier*>* identifierList, DataType* dataType);
       list<Identifier*>* identifierList;
       DataType* dataType;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -358,16 +358,34 @@ class VariableDeclarationPart : public Node {
       VariableDeclarationPart(list<VariableDeclaration*>* variableDeclarations);
       VariableDeclarationPart();
       list<VariableDeclaration*>* variableDeclarations;
-      void execute();
+      void codeGen();
       void print();
+};
+
+class FunctionBlock: public Node{
+    public:
+      FunctionBlock(Block* block);
+      Block* block;
+      void codeGen();
+};
+
+class Function: public Node{
+    public:
+      Function(Identifier* identifier, list<VariableDeclaration*>* variableDeclarations, FunctionBlock* block);
+      Identifier* identifier;
+      list<VariableDeclaration*>* variableDeclarations;
+      FunctionBlock* block;
+      void codeGen();
 };
 
 class Block : public Node {
    public:
       Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* statementPart);
+      Block(VariableDeclarationPart* variableDeclarationPart, list<Function*>* functions, StatementPart* statementPart);
+      list<Function*>* functions;
       VariableDeclarationPart* variableDeclarationPart;
       StatementPart* statementPart;
-      void execute();
+      void codeGen();
       void print();
 };
 
@@ -376,7 +394,7 @@ class Program : public Node {
       Program(Identifier* identifier, Block* block);
       Identifier* identifier;
       Block* block;
-      void execute();
+      void codeGen();
       void print();
 };
 #endif

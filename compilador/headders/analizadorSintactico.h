@@ -18,6 +18,10 @@ class AnalizadorSintactico {
       static Identifier* identifier(list<Token*>* tokenList);
       static VariableDeclarationPart* variableDeclarationPart(list<Token*>* tokenList);
       static void optionalVariableDeclarationsPart(list<Token*>* tokenList, VariableDeclarationPart* variableDeclarationPart);
+
+      static void errorMsg(string msg);
+      static void errorMsgTkn(string expected, Token* token);
+
       static VariableDeclaration* variableDeclaration(list<Token*>* tokenList);
       static void optionalVariableDeclarations(list<Token*>* tokenList, std::list<Identifier*>* identifierList);
 
@@ -26,7 +30,7 @@ class AnalizadorSintactico {
       static IndexRange* indexRange(list<Token*>* tokenList);
       static SimpleType simpleType(list<Token*>* tokenList);
       static TypeIdentifier* typeIdentifier(list<Token*>* tokenList);
-      
+
 
       static StatementPart* statementPart(list<Token*>* tokenList);
       static CompoundStatement* compoundStatement(list<Token*>* tokenList);
@@ -37,7 +41,7 @@ class AnalizadorSintactico {
       static AssignmentStatement* assignmentStatement(list<Token*>* tokenList);
       static ReadStatement* readStatement(list<Token*>* tokenList);
       static WriteStatement* writeStatement(list<Token*>* tokenList);
-      
+
       static StructuredStatement* structuredStatement(list<Token*>* tokenList);
       static IfStatement* ifStatement(list<Token*>* tokenList);
       static WhileStatement* whileStatement(list<Token*>* tokenList);

@@ -1,4 +1,4 @@
-#include "../headders/lexer.h"
+#include <headders/lexer.h>
 #include<vector>
 #include <algorithm>
 
