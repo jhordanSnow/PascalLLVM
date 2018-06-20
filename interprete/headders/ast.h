@@ -362,26 +362,16 @@ class VariableDeclarationPart : public Node {
       void print();
 };
 
-class FunctionBlock: public Node{
+class Function{
     public:
-      FunctionBlock(Block* block);
-      Block* block;
-      void execute();
-};
-
-class Function: public Node{
-    public:
-      Function(Identifier* identifier, list<VariableDeclaration*>* variableDeclarations, FunctionBlock* block);
-      Identifier* identifier;
+      Function(list<VariableDeclaration*>* variableDeclarations, StatementPart* statement);
       list<VariableDeclaration*>* variableDeclarations;
-      FunctionBlock* block;
-      void execute();
+      StatementPart* statement;
 };
 
 class Block : public Node {
    public:
       Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* statementPart);
-      Block(VariableDeclarationPart* variableDeclarationPart, list<Function*>* functions, StatementPart* statementPart);
       list<Function*>* functions;
       VariableDeclarationPart* variableDeclarationPart;
       StatementPart* statementPart;

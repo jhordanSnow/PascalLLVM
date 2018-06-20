@@ -39,6 +39,7 @@ int main(int argc, char** argv) {
    }
 
    Lexer* lexer = new Lexer();
+   AnalizadorSintactico* analizador = new AnalizadorSintactico();
 
    list<string>* code = getInputStream(argv[1]);
    list<Token*>* tokens = lexer->tokenize(code);
@@ -47,7 +48,7 @@ int main(int argc, char** argv) {
      std::cout << t->getTokenLocation() << ": " << t->getTokenName() << "\n";
    }*/
 
-   Program* p = AnalizadorSintactico::analizar(tokens);
+   Program* p = analizador->analizar(tokens);
    //p->print();
    p->execute();
 

@@ -842,22 +842,7 @@ void Block::print() {
    cout << "}" << endl;
 };
 
-FunctionBlock::FunctionBlock(Block* block) : Node(){
-  this->block = block;
-};
-
-void FunctionBlock::execute(){
-  block->execute();
-};
-
-Function::Function(Identifier* identifier, list<VariableDeclaration*>* variableDeclarations, FunctionBlock* block) : Node(){
-  this->identifier = identifier;
+Function::Function(list<VariableDeclaration*>* variableDeclarations, StatementPart* statement){
   this->variableDeclarations = variableDeclarations;
-  this->block = block;
+  this->statement = statement;
 };
-
-Block::Block(VariableDeclarationPart* variableDeclarationPart, list<Function*>* functions, StatementPart* statementPart):Node(){
-  this->variableDeclarationPart = variableDeclarationPart;
-  this->functions = functions;
-  this->statementPart = statementPart;
-}
