@@ -11,9 +11,12 @@ Program* AnalizadorSintactico::analizar(list<Token*>* tokenList) {
 
 Program* AnalizadorSintactico::program(list<Token*>* tokenList) {
    Token* tokenHead = tokenList->front();
-   if (tokenHead->getTokenName() == "program") {
+   string expected = "program";
+   if (tokenHead->getTokenName() == expected) {
       tokenList->pop_front();
-   } // else error
+   }else{
+     errorMsgTkn(expected, tokenHead);
+   }
 
    tokenHead = tokenList->front();
    Identifier* i;
@@ -24,6 +27,8 @@ Program* AnalizadorSintactico::program(list<Token*>* tokenList) {
    tokenHead = tokenList->front();
    if (tokenHead->getTokenName() == ";") {
       tokenList->pop_front();
+   }else{
+     errorMsgTkn(";", tokenHead);
    }
 
    tokenHead = tokenList->front();
@@ -39,9 +44,17 @@ Identifier* AnalizadorSintactico::identifier(list<Token*>* tokenList) {
 }
 
 Block* AnalizadorSintactico::block(list<Token*>* tokenList) {
-   return new Block(variableDeclarationPart(tokenList),statementPart(tokenList));
+  VariableDeclarationPart* VD = variableDeclarationPart(tokenList);
+  list<Function*>* functions = new list<Function*>();
+  if (tokenList->front()->getTokenName() == "function"  || tokenList->front()->getTokenName() == "procedure"){
+    //functions->push_front(functionsPart(tokenList));
+    errorMsg("Functions and procedures not supported");
+  }
+  if (functions->size() > 0){
+      return new Block(VD, functions, statementPart(tokenList));
+  }
+  return new Block(VD, statementPart(tokenList));
 }
-
 
 VariableDeclarationPart* AnalizadorSintactico::variableDeclarationPart(list<Token*>* tokenList) {
    Token* tokenHead = tokenList->front();
@@ -54,23 +67,31 @@ VariableDeclarationPart* AnalizadorSintactico::variableDeclarationPart(list<Toke
       tokenHead = tokenList->front();
       if (tokenHead->getTokenName() == ";") {
           tokenList->pop_front();
+      }else{
+        errorMsgTkn(";", tokenHead);
       }
       optionalVariableDeclarationsPart(tokenList, variableDeclarationPart);
       return variableDeclarationPart;
+   }else{
+     errorMsgTkn("var", tokenHead);
    }
    return NULL;
 }
 
 void AnalizadorSintactico::optionalVariableDeclarationsPart(list<Token*>* tokenList, VariableDeclarationPart* variableDeclarationPart) {
   Token* tokenHead = tokenList->front();
-	if (tokenHead->getTokenType() == TokenType::IDENTIFIER) {
-     variableDeclarationPart->variableDeclarations->push_back(variableDeclaration(tokenList));
-     tokenHead = tokenList->front();
+  if (tokenHead->getTokenName() != "function" && tokenHead->getTokenName() != "procedure"){
+    if (tokenHead->getTokenType() == TokenType::IDENTIFIER) {
+      variableDeclarationPart->variableDeclarations->push_back(variableDeclaration(tokenList));
+      tokenHead = tokenList->front();
       if (tokenHead->getTokenName() == ";") {
         tokenList->pop_front();
         optionalVariableDeclarationsPart(tokenList, variableDeclarationPart);
+      }else{
+        errorMsgTkn(";", tokenHead);
       }
-	}
+    }
+  }
 }
 
 
@@ -90,8 +111,9 @@ VariableDeclaration* AnalizadorSintactico::variableDeclaration(list<Token*>* tok
    }else if (tokenHead->getTokenName() == ",") {
       identifierList->push_back(identifier(tokenList));
       return optionalVariableDeclarations(tokenList, identifierList);
+   }else{
+     errorMsgTkn(",", tokenHead);
    }
-   //error
  }
 
 DataType* AnalizadorSintactico::dataType(list<Token*>* tokenList){
@@ -108,7 +130,10 @@ StatementPart* AnalizadorSintactico::statementPart(list<Token*>* tokenList) {
   if (tokenHead->getTokenName() == "begin"){
     tokenList->pop_front();
     return new StatementPart(compoundStatement(tokenList));
-  }return NULL;
+  }else{
+    errorMsgTkn("begin", tokenHead);
+  }
+  return NULL;
 }
 
 CompoundStatement* AnalizadorSintactico::compoundStatement(list<Token*>* tokenList) {
@@ -119,6 +144,8 @@ CompoundStatement* AnalizadorSintactico::compoundStatement(list<Token*>* tokenLi
    Token* tokenHead = tokenList->front();
    if (tokenHead->getTokenName() == "end") {
       tokenList->pop_front();
+   }else{
+     errorMsgTkn("end", tokenHead);
    }
    return statement;
 }
@@ -129,8 +156,11 @@ void AnalizadorSintactico::optionalStatements(list<Token*>* tokenList, CompoundS
      tokenList->pop_front();
      compoundStatement->statementList->push_back(AnalizadorSintactico::statement(tokenList));
      optionalStatements(tokenList, compoundStatement);
+   }else{
+     if (tokenHead->getTokenName() != "end"){
+       errorMsgTkn(";", tokenHead);
+     }
    }
-
 }
 
 Statement* AnalizadorSintactico::statement(list<Token*>* tokenList){
@@ -138,7 +168,6 @@ Statement* AnalizadorSintactico::statement(list<Token*>* tokenList){
    if (tokenHead->getTokenName() == "begin" || tokenHead->getTokenName() == "if" || tokenHead->getTokenName() == "while"){
       return new Statement(structuredStatement(tokenList));
    }else{
-
       return new Statement(simpleStatement(tokenList));
    }
 }
@@ -164,6 +193,7 @@ AssignmentStatement* AnalizadorSintactico::assignmentStatement(list<Token*>* tok
       Expression* expression = AnalizadorSintactico::expression(tokenList);
       return new AssignmentStatement(variable, expression);
    }else{
+      errorMsgTkn(":=", tokenHead);
       return new AssignmentStatement(variable, NULL);
    }
 }
@@ -180,7 +210,11 @@ ReadStatement* AnalizadorSintactico::readStatement(list<Token*>* tokenList){
       if (tokenHead->getTokenName() == ")"){
          tokenList->pop_front();
          return readStatement;
+      }else{
+        errorMsgTkn(")", tokenHead);
       }
+   }else{
+     errorMsgTkn("(", tokenHead);
    }
    return NULL;
 }
@@ -206,7 +240,11 @@ WriteStatement* AnalizadorSintactico::writeStatement(list<Token*>* tokenList){
       if (tokenHead->getTokenName() == ")"){
          tokenList->pop_front();
          return writeStatement;
+      }else{
+        errorMsgTkn(")", tokenHead);
       }
+   }else{
+     errorMsgTkn("(", tokenHead);
    }
    return NULL;
 }
@@ -247,6 +285,8 @@ IfStatement* AnalizadorSintactico::ifStatement(list<Token*>* tokenList){
       }else{
          return new IfStatement(ifExpression, thenStatement);
       }
+   }else{
+     errorMsgTkn("then", tokenHead);
    }
    return NULL;
 }
@@ -258,6 +298,8 @@ WhileStatement* AnalizadorSintactico::whileStatement(list<Token*>* tokenList){
       tokenList->pop_front();
       Statement* doStatement = AnalizadorSintactico::statement(tokenList);
       return new WhileStatement(whileExpression, doStatement);
+   }else{
+     errorMsgTkn("do", tokenHead);
    }
    return NULL;
 }
@@ -280,6 +322,8 @@ ArrayType* AnalizadorSintactico::arrayType(list<Token*>* tokenList){
             return new ArrayType(index, type);
          }
       }
+   }else{
+     errorMsgTkn("array", tokenHead);
    }
    return NULL;
 }
@@ -298,8 +342,14 @@ IndexRange* AnalizadorSintactico::indexRange(list<Token*>* tokenList){
           int end = atoi(tokenHead->getTokenName().data());
           IndexRange* ir = new IndexRange(begin,end);
           return ir;
+        }else{
+          errorMsgTkn("number", tokenHead);
         }
+      }else{
+        errorMsgTkn("..", tokenHead);
       }
+   }else{
+     errorMsgTkn("number", tokenHead);
    }
    return NULL;
 }
@@ -353,9 +403,11 @@ IndexedVariable* AnalizadorSintactico::indexedVariable(list<Token*>* tokenList){
          tokenList->pop_front();
          return new IndexedVariable(array, expression);
       }else{
-        //No hay cerrar parentesis ]
+        errorMsgTkn("]", tokenHead);
       }
-   }//no hay
+   }else{
+     errorMsgTkn("[", tokenHead);
+   }
    return NULL;
 
 }
@@ -450,8 +502,22 @@ AbstractFactor* AnalizadorSintactico::factor(list<Token*>* tokenList){
       if (tokenHead->getTokenName() == ")") {
          tokenList->pop_front();
          return new Factor(exp);
+      }else{
+        errorMsgTkn(")", tokenHead);
       }
    }
 
    return new Factor(new VariableNT(entireVariable(tokenList)));
+}
+
+void AnalizadorSintactico::errorMsgTkn(string expected, Token* token){
+  string msg = "Syntax error: Expected '" + expected;
+  msg += "' at line " + to_string(token->getTokenLocation());
+  msg += " got '" + token->getTokenName() + "' instead.";
+  errorMsg(msg);
+}
+
+void AnalizadorSintactico::errorMsg(string msg){
+  std::cout << msg << '\n';
+  exit(0);
 }

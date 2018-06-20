@@ -831,11 +831,31 @@ void VariableDeclarationPart::print() {
       }
    }
    cout << "}" << endl;
-}
+};
 
 void Block::print() {
    cout << "block {\n";
    if (variableDeclarationPart != 0) variableDeclarationPart->print();
    if (statementPart != 0) statementPart->print();
    cout << "}" << endl;
+};
+
+FunctionBlock::FunctionBlock(Block* block) : Node(){
+  this->block = block;
+};
+
+void FunctionBlock::execute(){
+  block->execute();
+};
+
+Function::Function(Identifier* identifier, list<VariableDeclaration*>* variableDeclarations, FunctionBlock* block) : Node(){
+  this->identifier = identifier;
+  this->variableDeclarations = variableDeclarations;
+  this->block = block;
+};
+
+Block::Block(VariableDeclarationPart* variableDeclarationPart, list<Function*>* functions, StatementPart* statementPart):Node(){
+  this->variableDeclarationPart = variableDeclarationPart;
+  this->functions = functions;
+  this->statementPart = statementPart;
 }

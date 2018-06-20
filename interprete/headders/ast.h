@@ -170,7 +170,7 @@ enum class MultiplicationOperator{
 };
 
 enum class Sign {
-   UNKNOWN,  
+   UNKNOWN,
    POSITIVE,
    NEGATIVE
 };
@@ -362,9 +362,27 @@ class VariableDeclarationPart : public Node {
       void print();
 };
 
+class FunctionBlock: public Node{
+    public:
+      FunctionBlock(Block* block);
+      Block* block;
+      void execute();
+};
+
+class Function: public Node{
+    public:
+      Function(Identifier* identifier, list<VariableDeclaration*>* variableDeclarations, FunctionBlock* block);
+      Identifier* identifier;
+      list<VariableDeclaration*>* variableDeclarations;
+      FunctionBlock* block;
+      void execute();
+};
+
 class Block : public Node {
    public:
       Block(VariableDeclarationPart* variableDeclarationPart, StatementPart* statementPart);
+      Block(VariableDeclarationPart* variableDeclarationPart, list<Function*>* functions, StatementPart* statementPart);
+      list<Function*>* functions;
       VariableDeclarationPart* variableDeclarationPart;
       StatementPart* statementPart;
       void execute();
